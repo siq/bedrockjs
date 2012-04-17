@@ -1,0 +1,16 @@
+{
+  "name": "bedrockjs",
+  "description": "core javascript functionality for storediq apps",
+  "contributors": [
+     "Aaron Stacy <astacy@storediq.com>",
+     "Jordan McCoy"
+  ],
+  "version": "0.0.x",
+  "dependencies": {
+    "siq-vendor-js": "0.0.x",
+    "siq-js-component": "0.0.x"
+  },
+  "component": {
+    "name": "bedrock"
+  }
+}

@@ -1,8 +1,8 @@
 /*global test, asyncTest, ok, equal, deepEqual, start, module, strictEqual, notStrictEqual, raises*/
-require([
-    'path!vendor:underscore',
-    'path!bedrock:class',
-    'path!bedrock:events'
+define([
+    'component!vendor:underscore',
+    './../class',
+    './../events'
 ], function(_, Class, Eventable) {
     module('events');
 

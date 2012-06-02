@@ -1,6 +1,6 @@
 /*global test, asyncTest, ok, equal, deepEqual, start, module, strictEqual, notStrictEqual, raises*/
 define([
-    'component!vendor:underscore',
+    'vendor/underscore',
     './../class',
     './../events'
 ], function(_, Class, Eventable) {

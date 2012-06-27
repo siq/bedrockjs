@@ -7,8 +7,8 @@
   ],
   "version": "0.0.4",
   "dependencies": {
-    "csi": "0.0.x",
-    "siq-vendor-js": "0.0.x"
+    "csi": "git+ssh://git@github.com:siq/csi.git",
+    "siq-vendor-js": "git+ssh://git@github.com:siq/siq-vendor-js.git"
   },
   "component": {
     "name": "bedrock"

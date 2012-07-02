@@ -63,5 +63,32 @@ define([
         strictEqual(calls, 3);
     });
 
+    test('subscribe to multiple events at once', function() {
+        var eventful = Eventful(),
+            happened = {change: 0, update: 0};
+        eventful.on('change update', function(eventName) {
+            happened[eventName]++;
+        }).trigger('change').trigger('update');
+
+        equal(happened.change, 1);
+        equal(happened.update, 1);
+    });
+
+    test('unsubscribe to multiple events at once', function() {
+        var eventful = Eventful(),
+            happened = {change: 0, update: 0};
+        eventful.on('change update', function(eventName) {
+            happened[eventName]++;
+        }).trigger('change').trigger('update');
+
+        equal(happened.change, 1);
+        equal(happened.update, 1);
+
+        eventful.off('change update').trigger('change').trigger('update');
+
+        equal(happened.change, 1);
+        equal(happened.update, 1);
+    });
+
     start();
 });

@@ -42,6 +42,14 @@ define([], function() {
         };
     }
 
+    if (!window.isNaN) {
+        // from https://github.com/documentcloud/underscore/blob/master/underscore.js
+        window.isNaN = function(value) {
+            // `NaN` is the only value for which `===` is not reflexive
+            return value === value;
+        };
+    }
+
     // not technically a polyfill, but this prevents bugs and makes life better
     // for everyone
     if (!window.console) {

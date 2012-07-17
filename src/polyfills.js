@@ -14,8 +14,7 @@ define([], function() {
         prototypeOfObject = Object.prototype,
         slice = prototypeOfArray.slice,
         // Having a toString local variable name breaks in Opera so use _toString.
-        _toString = call.bind(prototypeOfObject.toString),
-        owns = call.bind(prototypeOfObject.hasOwnProperty),
+        _toString = prototypeOfObject.toString,
         prepareString = "a"[0] != "a",
         toObject = function (o) {
             if (o == null) { // this matches both null and undefined
@@ -56,7 +55,7 @@ define([], function() {
                 length = self.length >>> 0;
 
             // If no callback function or if callback is not a callable function
-            if (_toString(fun) != "[object Function]") {
+            if (_toString.call(fun) != "[object Function]") {
                 throw new TypeError(); // TODO message
             }
 
@@ -81,7 +80,7 @@ define([], function() {
                 thisp = arguments[1];
 
             // If no callback function or if callback is not a callable function
-            if (_toString(fun) != "[object Function]") {
+            if (_toString.call(fun) != "[object Function]") {
                 throw new TypeError(fun + " is not a function");
             }
 

@@ -1,9 +1,35 @@
 // es5 polyfills
+//
+// mostly ripped off directly from here:
+//
+//    https://github.com/kriskowal/es5-shim/
+//
 define([], function() {
     var ignored = function() {},
         ws = '\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002' +
              '\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F' +
-             '\u3000\u2028\u2029\uFEFF';
+             '\u3000\u2028\u2029\uFEFF',
+        call = Function.prototype.call,
+        prototypeOfArray = Array.prototype,
+        prototypeOfObject = Object.prototype,
+        slice = prototypeOfArray.slice,
+        // Having a toString local variable name breaks in Opera so use _toString.
+        _toString = call.bind(prototypeOfObject.toString),
+        owns = call.bind(prototypeOfObject.hasOwnProperty),
+        prepareString = "a"[0] != "a",
+        toObject = function (o) {
+            if (o == null) { // this matches both null and undefined
+                throw new TypeError("can't convert "+o+" to object");
+            }
+            // If the implementation doesn't support by-index access of
+            // string characters (ex. IE < 9), split the string
+            if (prepareString && typeof o == "string" && o) {
+                return o.split("");
+            }
+            return Object(o);
+        };
+
+
 
     if (!String.prototype.trim || ws.trim()) {
         // http://blog.stevenlevithan.com/archives/faster-trim-javascript

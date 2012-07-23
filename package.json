@@ -10,7 +10,7 @@
     "csi": "git+ssh://git@github.com:siq/csi.git",
     "siq-vendor-js": "git+ssh://git@github.com:siq/siq-vendor-js.git"
   },
-  "component": {
+  "csi": {
     "name": "bedrock"
   },
   "devDependencies": {},

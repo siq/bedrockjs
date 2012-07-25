@@ -55,8 +55,8 @@ define([
 
         // Create getter / setter methods to emulate string based nested access
         
-        var getAttributeValue = function(object, name) {
-            var context = object, nesting = name.split("."), index, item;
+        var getAttributeValue = function(name) {
+            var context = this, nesting = name.split("."), index, item;
             
             for(index = 0; index < nesting.length-1; ++index) {
                 item = nesting[index];
@@ -68,8 +68,8 @@ define([
             return context[nesting[nesting.length-1]];
         };
         
-        var setAttributeValue = function(object, name, value) {
-            var context = object, nesting = name.split("."), index, item;
+        var setAttributeValue = function(name, value) {
+            var context = this, nesting = name.split("."), index, item;
             
             for(index = 0; index < nesting.length-1; ++index) {
                 item = nesting[index];

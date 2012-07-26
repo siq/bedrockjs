@@ -46,7 +46,7 @@ define([
             item = nesting[index];
             if (!context[item]) {
                 if(!value) {
-                    return object;
+                    return;
                 } else {
                     context[item] = {};
                 }

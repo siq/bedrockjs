@@ -49,6 +49,8 @@ define([
 
         equal(myClassInstnace.prop('foo.bar'), 'bang', 'getting');
 
+        equal(myClassInstnace.prop('foo.bare'), undefined, 'getting non existing stuff');
+
         ret = myClassInstnace.prop('foo', 'what?');
 
         equal(myClassInstnace.foo, 'what?', 'setting to non-nested prop');

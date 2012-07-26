@@ -40,14 +40,13 @@ define([
 
     var Class = function() {};
 
-        
     Class.prop = function(object, name, value) {
         var context = object, nesting = name.split("."), index, item;
         for(index = 0; index < nesting.length-1; ++index) {
             item = nesting[index];
             if (!context[item]) {
                 if(!value) {
-                    return;
+                    return object;
                 } else {
                     context[item] = {};
                 }
@@ -56,8 +55,10 @@ define([
         }
         if(value) {
             context[nesting[nesting.length-1]] = value;
+            return object;
+        } else {
+            return context[nesting[nesting.length-1]];
         }
-        return context[nesting[nesting.length-1]];
     };
     
     var extend = function(namespace, options) {

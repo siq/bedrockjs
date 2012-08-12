@@ -57,14 +57,37 @@ define([
         // if you never want an event triggered, set `_settableEventName` to
         // `null` in your class definition.
         //
+        // ### `_settableOnChange`
+        //
+        // if this property is a function, then the callback is called when a
+        // call to `set` incurs a change.  if it is a string, then the
+        // corresponding property is looked up on `this`, and called.  the
+        // function will be called in the context of the instance object:
+        //
+        //     var MyClass = MySuperClass.extend({
+        //         _settableOnChange: function(changed, opts) {
+        //
+        //             // 'this' refers to the instance of `MyClass`
+        //             this.update(changed);
+        //
+        //             // `opts` is the opts used in the `set` call
+        //             if (!opts.silent) {
+        //                 this.trigger('optionsChange', changed, opts);
+        //             }
+        //         }
+        //         // ... etc ...
+        //     });
+        //
+        //     var MyOtherClass = MySuperClass.extend({
+        //         // when `set` causes a change, call `this.onChange`
+        //         _settableOnChange: 'onChange'
+        //         // ... etc ...
+        //     });
+        //
         __mixin__: function(base, prototype, mixin) {
             if (typeof prototype._settableProperty === 'undefined' &&
                 typeof base._settableProperty      === 'undefined') {
                 prototype._settableProperty = '_settableProperties';
-            }
-            if (!prototype._settableEventName &&
-                !base._settableEventName) {
-                prototype._settableEventName = 'change';
             }
         },
 
@@ -160,8 +183,15 @@ define([
                 }
             }
 
-            if (changed && !opts.silent && this.trigger && eventName) {
-                this.trigger(eventName, changes);
+            if (changed && !opts.silent) {
+                if (this.trigger && eventName) {
+                    this.trigger(eventName, changes);
+                }
+                if (_.isFunction(this._settableOnChange)) {
+                    this._settableOnChange.call(this, changes, opts);
+                } else if (_.isString(this._settableOnChange)) {
+                    this[this._settableOnChange](changes, opts);
+                }
             }
 
             return this;

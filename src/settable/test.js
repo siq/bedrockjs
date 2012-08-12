@@ -6,7 +6,9 @@ define([
     './../settable'
 ], function(_, Class, Eventable, Settable) {
     var MyClass = Class.extend({}, {mixins: [Settable]}),
-        EventableClass = Class.extend({}, {mixins: [Settable, Eventable]});
+        EventableClass = Class.extend({
+            _settableEventName: 'change'
+        }, {mixins: [Settable, Eventable]});
 
     module('basic functionality');
 
@@ -179,6 +181,53 @@ define([
 
         instance.set({foo: 'bar'});
 
+    });
+
+    asyncTest('setting _onChange to a function', function() {
+        var changeFired = false,
+            MyClass = Class.extend({
+                _settableOnChange: function(changed, opts) {
+                    ok(changeFired = true, 'change happened');
+                    ok(this === instance, 'context is set correctly');
+                    ok(changed.foo, 'changed object reflects changes');
+                    equal(opts.sheezy, 'fo reezy');
+                    start();
+                }
+            }, {mixins: [Settable]}),
+            instance = MyClass();
+
+        setTimeout(function() {
+            if (!changeFired) {
+                ok(false, 'event wasnt triggered');
+                start();
+            }
+        }, 50);
+
+        instance.set({foo: 'bar'}, {sheezy: 'fo reezy'});
+    });
+
+    asyncTest('setting _onChange to a string', function() {
+        var changeFired = false,
+            MyClass = Class.extend({
+                _settableOnChange: 'onChange',
+                onChange: function(changed, opts) {
+                    ok(changeFired = true, 'change happened');
+                    ok(this === instance, 'context is set correctly');
+                    ok(changed.foo, 'changed object reflects changes');
+                    equal(opts.sheezy, 'fo reezy');
+                    start();
+                }
+            }, {mixins: [Settable]}),
+            instance = MyClass();
+
+        setTimeout(function() {
+            if (!changeFired) {
+                ok(false, 'event wasnt triggered');
+                start();
+            }
+        }, 50);
+
+        instance.set({foo: 'bar'}, {sheezy: 'fo reezy'});
     });
 
     module('nested properties');

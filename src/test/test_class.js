@@ -62,6 +62,15 @@ define([
 
     });
 
+    test('setting `undefined`', function() {
+        var o = {};
+
+        Class.prop(o, 'foo', undefined);
+
+        ok(o.hasOwnProperty('foo'));
+        ok(typeof o.foo === 'undefined');
+    });
+
     start();
 });
 

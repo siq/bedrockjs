@@ -41,19 +41,20 @@ define([
     var Class = function() {};
 
     Class.prop = function(object, name, value) {
-        var context = object, nesting = name.split("."), index, item;
+        var context = object, nesting = name.split("."), index, item,
+            isSet = arguments.length === 3;
         for(index = 0; index < nesting.length-1; ++index) {
             item = nesting[index];
             if (!context[item]) {
-                if(!value) {
-                    return;
+                if(!isSet) {
+                    return context[item];
                 } else {
                     context[item] = {};
                 }
             }
             context = context[item];
         }
-        if(value) {
+        if(isSet) {
             context[nesting[nesting.length-1]] = value;
             return object;
         } else {
@@ -75,8 +76,10 @@ define([
         inheriting = false;
 
         // Create getter / setter methods to emulate string based nested access
-        prototype.prop = function(name, value) {
-            return Class.prop(this, name, value);
+        prototype.prop = function() {
+            var args = slice.call(arguments, 0);
+            args.unshift(this);
+            return Class.prop.apply(Class, args);
         };
         
 

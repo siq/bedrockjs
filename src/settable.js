@@ -121,7 +121,7 @@ define([
         // this can be called in any of the following ways:
         //
         //     instance.set({/* props */);
-        //     instance.set({/* props */, {/* opts */});
+        //     instance.set({/* props */}, {/* opts */});
         //     instance.set('foo', bar);
         //     instance.set('foo', bar, {/* opts */});
         //

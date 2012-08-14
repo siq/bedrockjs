@@ -9,63 +9,36 @@ define([
         foo: {bar: 'baz'}
     });
 
-    module('prop');
+    module('nestedProp');
 
-    test('`Class.prop` works on bare JS objects', function() {
+    test('`Class.nestedProp` works on bare JS objects', function() {
         var myObj = {foo: {bar: 'baz'}}, ret;
 
         equal(myObj.foo.bar, 'baz', 'initial check');
 
-        ret = Class.prop(myObj, 'foo.bar', 'bang');
+        ret = Class.nestedProp(myObj, 'foo.bar', 'bang');
 
         equal(myObj.foo.bar, 'bang', 'setting');
 
         ok(ret === myObj,
             'return value of set is the object to enable chaining');
 
-        equal(Class.prop(myObj, 'foo.bar'), 'bang', 'getting');
+        equal(Class.nestedProp(myObj, 'foo.bar'), 'bang', 'getting');
 
-        ret = Class.prop(myObj, 'foo', 'what?');
+        ret = Class.nestedProp(myObj, 'foo', 'what?');
 
         equal(myObj.foo, 'what?', 'setting to non-nested prop');
 
         ok(ret === myObj,
             'return value of set is the object to enable chaining');
 
-        equal(Class.prop(myObj, 'foo'), 'what?', 'getting non-nested prop');
+        equal(Class.nestedProp(myObj, 'foo'), 'what?', 'getting non-nested prop');
     }); 
-
-    test('`myClassInstnace.prop`', function() {
-        var myClassInstnace = TestClass(), ret;
-
-        equal(myClassInstnace.foo.bar, 'baz', 'initial check');
-
-        ret = myClassInstnace.prop('foo.bar', 'bang');
-
-        equal(myClassInstnace.foo.bar, 'bang', 'setting');
-
-        ok(ret === myClassInstnace,
-            'return value of set is the instance to enable chaining');
-
-        equal(myClassInstnace.prop('foo.bar'), 'bang', 'getting');
-
-        equal(myClassInstnace.prop('foo.bare'), undefined, 'getting non existing stuff');
-
-        ret = myClassInstnace.prop('foo', 'what?');
-
-        equal(myClassInstnace.foo, 'what?', 'setting to non-nested prop');
-
-        ok(ret === myClassInstnace,
-            'return value of set is the instance to enable chaining');
-
-        equal(myClassInstnace.prop('foo'), 'what?', 'getting non-nested prop');
-
-    });
 
     test('setting `undefined`', function() {
         var o = {};
 
-        Class.prop(o, 'foo', undefined);
+        Class.nestedProp(o, 'foo', undefined);
 
         ok(o.hasOwnProperty('foo'));
         ok(typeof o.foo === 'undefined');

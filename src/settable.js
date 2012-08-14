@@ -2,7 +2,7 @@ define([
     'vendor/underscore',
     './class'
 ], function(_, Class) {
-    var _prop = Class.prop;
+    var _nested = Class.nestedProp;
 
     return {
         // # Settable
@@ -10,7 +10,6 @@ define([
         // mixin standard instance.get() and instance.set() semantics
         //
         // also provides a .prop() method that's similar to the jquery function
-        //  -----> XXX CANT TO THIS TIL WE REFACTOR MODEL XXX
         //
         // ## configuration options
         //
@@ -94,7 +93,7 @@ define([
         get: function(key, opts) {
             var obj = this._settableProperty == null?
                 this : this[this._settableProperty];
-            return opts && opts.notNested? obj[key] : _prop(obj, key); 
+            return opts && opts.notNested? obj[key] : _nested(obj, key); 
         },
 
         // return the previous value of a property
@@ -112,11 +111,11 @@ define([
         //     instance.prop('stringValueForFirstArg')  // => get
         //     instance.prop(/* any other args */)      // => set
         //
-        // CAN'T DO THIS UNTIL SETTABLE IS INTEGRATED W/ MODEL.JS
-        // prop: function(/* arguments */) {
-        //     return this[_.isString(arguments[0])? 'get' : 'set']
-        //         .apply(this, arguments);
-        // },
+        prop: function(/* arguments */) {
+            var isGet = arguments.length === 1 && _.isString(arguments[0]);
+            return this[isGet? 'get' : 'set']
+                .apply(this, arguments);
+        },
 
         // this can be called in any of the following ways:
         //
@@ -176,8 +175,8 @@ define([
                             prevProps[prop] = value;
                             props[prop] = newValue;
                         } else {
-                            _prop(prevProps, prop, value);
-                            _prop(props, prop, newValue);
+                            _nested(prevProps, prop, value);
+                            _nested(props, prop, newValue);
                         }
                     }
                 }

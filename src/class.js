@@ -40,7 +40,7 @@ define([
 
     var Class = function() {};
 
-    Class.prop = function(object, name, value) {
+    Class.nestedProp = function(object, name, value) {
         var context = object, nesting = name.split("."), index, item,
             isSet = arguments.length === 3;
         for(index = 0; index < nesting.length-1; ++index) {
@@ -76,11 +76,11 @@ define([
         inheriting = false;
 
         // Create getter / setter methods to emulate string based nested access
-        prototype.prop = function() {
-            var args = slice.call(arguments, 0);
-            args.unshift(this);
-            return Class.prop.apply(Class, args);
-        };
+        // prototype.prop = function() {
+        //     var args = slice.call(arguments, 0);
+        //     args.unshift(this);
+        //     return Class.nestedProp.apply(Class, args);
+        // };
         
 
         if(mixins) {

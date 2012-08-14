@@ -240,6 +240,25 @@ define([
         instance.set('foo', 'baz2');
     });
 
+    module('has');
+
+    test('basic `has` functionality', function() {
+        var m = MyClass().set({foo: 'bar'});
+        equal(m.has('foo'), true);
+        equal(m.has('baz'), false);
+    });
+
+    test('`has` returns true when something set to undefined or null', function() {
+        var m = MyClass().set({foo: undefined, bar: null});
+        equal(m.has('foo'), true);
+        equal(m.has('bar'), true);
+
+        m.set({baz: 'abc'});
+        equal(m.has('baz'), true);
+        m.set({baz: undefined});
+        equal(m.has('baz'), true);
+    });
+
     start();
 });
 

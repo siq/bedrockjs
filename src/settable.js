@@ -96,6 +96,12 @@ define([
             return opts && opts.notNested? obj[key] : _nested(obj, key); 
         },
 
+        has: function(key) {
+            var props = this._settableProperty == null?
+                this : this[this._settableProperty];
+            return props.hasOwnProperty(key);
+        },
+
         // return the previous value of a property
         // return all previous properties if 'key == null'
         previous: function(key) {
@@ -169,7 +175,12 @@ define([
                     value = props[prop];
                     newValue = newProps[prop];
 
-                    if (newValue !== value) {
+                    // we need to check for a value change, but we also need to
+                    // check if something that was not there is being set to
+                    // 'undefined' (in which case the values would be the same,
+                    // but we'd still need to set it so that `.has()` behaves
+                    // correctly
+                    if (newValue !== value || !props.hasOwnProperty(prop)) {
                         changes[prop] = changed = true;
                         if (opts.notNested) {
                             prevProps[prop] = value;

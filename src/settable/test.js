@@ -1,10 +1,11 @@
 /*global test, asyncTest, ok, equal, deepEqual, start, module, strictEqual, notStrictEqual, raises*/
 define([
     'vendor/underscore',
+    'vendor/moment',
     './../class',
     './../events',
     './../settable'
-], function(_, Class, Eventable, Settable) {
+], function(_, moment, Class, Eventable, Settable) {
     var MyClass = Class.extend({}, {mixins: [Settable]}),
         EventableClass = Class.extend({
             _settableEventName: 'change'
@@ -257,6 +258,30 @@ define([
         equal(m.has('baz'), true);
         m.set({baz: undefined});
         equal(m.has('baz'), true);
+    });
+
+    module('dates');
+
+    asyncTest('setting equivalent but different dates doesnt trigger', function() {
+        var d1 = moment(),
+            d2 = d1.clone(),
+            m = EventableClass().set('created', d1.toDate()),
+            triggered = false;
+
+        // sanity check
+        ok(d1.toDate() !== d2.toDate());
+        ok(d1.toDate().toString() === d2.toDate().toString());
+
+        m.on('change', function() {
+            triggered = true;
+        });
+        
+        m.set('created', d2.toDate());
+
+        setTimeout(function() {
+            equal(triggered, false, 'setting to an equivalent date shouldnt trigger');
+            start();
+        }, 50);
     });
 
     start();

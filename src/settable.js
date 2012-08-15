@@ -2,7 +2,13 @@ define([
     'vendor/underscore',
     './class'
 ], function(_, Class) {
-    var _nested = Class.nestedProp;
+    var _nested = Class.nestedProp,
+        areNotEquivDates = function(v1, v2) {
+            if (v1 && v1.getDate && v2 && v2.getDate) {
+                return v1.toString() !== v2.toString();
+            }
+            return true;
+        };
 
     return {
         // # Settable
@@ -141,7 +147,7 @@ define([
         // to disable this, set `opts.notNested` to true
         //
         set: function(/* arguments */) {
-            var prop, value, newValue, changed,
+            var prop, value, newValue, changed, changing, valuesArentEqual,
                 newProps = {}, opts = {}, changes = {},
                 eventName = this._settableEventName,
                 props = this._settableProperty == null?
@@ -170,17 +176,24 @@ define([
                 opts = arguments[2];
             }
 
+            changing = this._settableChanging;
+            this._settableChanging = true;
+
             for (prop in newProps) {
                 if (newProps.hasOwnProperty(prop)) {
                     value = props[prop];
                     newValue = newProps[prop];
 
-                    // we need to check for a value change, but we also need to
-                    // check if something that was not there is being set to
-                    // 'undefined' (in which case the values would be the same,
-                    // but we'd still need to set it so that `.has()` behaves
-                    // correctly
-                    if (newValue !== value || !props.hasOwnProperty(prop)) {
+                    valuesArentEqual = this._settableAreEqual?
+                        !this._settableAreEqual(value, newValue) :
+                        newValue !== value && areNotEquivDates(value, newValue);
+
+                    if (valuesArentEqual ||
+
+                        // if the prop doesnt exist, but is being set to undef
+                        // (necessary so `.has()` behaves correctly)
+                        !props.hasOwnProperty(prop)) {
+
                         changes[prop] = changed = true;
                         if (opts.notNested) {
                             prevProps[prop] = value;
@@ -193,15 +206,18 @@ define([
                 }
             }
 
-            if (changed && !opts.silent) {
-                if (this.trigger && eventName) {
-                    this.trigger(eventName, changes);
+            if (!changing) {
+                if (changed && !opts.silent) {
+                    if (this.trigger && eventName) {
+                        this.trigger(eventName, changes);
+                    }
+                    if (_.isFunction(this._settableOnChange)) {
+                        this._settableOnChange.call(this, changes, opts);
+                    } else if (_.isString(this._settableOnChange)) {
+                        this[this._settableOnChange](changes, opts);
+                    }
                 }
-                if (_.isFunction(this._settableOnChange)) {
-                    this._settableOnChange.call(this, changes, opts);
-                } else if (_.isString(this._settableOnChange)) {
-                    this[this._settableOnChange](changes, opts);
-                }
+                this._settableChanging = false;
             }
 
             return this;

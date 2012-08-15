@@ -176,8 +176,8 @@ define([
                 opts = arguments[2];
             }
 
-            changing = this._settableChanging;
-            this._settableChanging = true;
+            // changing = this._settableChanging;
+            // this._settableChanging = true;
 
             for (prop in newProps) {
                 if (newProps.hasOwnProperty(prop)) {
@@ -206,7 +206,7 @@ define([
                 }
             }
 
-            if (!changing) {
+            // if (!changing) {
                 if (changed && !opts.silent) {
                     if (this.trigger && eventName) {
                         this.trigger(eventName, changes);
@@ -217,8 +217,8 @@ define([
                         this[this._settableOnChange](changes, opts);
                     }
                 }
-                this._settableChanging = false;
-            }
+                // this._settableChanging = false;
+            // }
 
             return this;
         }

@@ -231,6 +231,30 @@ define([
         instance.set({foo: 'bar'}, {sheezy: 'fo reezy'});
     });
 
+    asyncTest('setting _settableAreEqual works correctly', function() {
+        var v1 = {foo: 'bar'}, v2 = {foo: 'bar'}, changed = false,
+            MyClass = EventableClass.extend({
+                _settableAreEqual: _.isEqual
+            }),
+            instance = MyClass().set('val', v1);
+
+        instance.on('change', function(evtName, changes) {
+            console.log('in change event, changed:',changes,_.isEmpty(changes));
+            changed = _.isEmpty(changes)? false : changes;
+        }).set('val', v2);
+
+        setTimeout(function() {
+            equal(changed, false);
+
+            instance.set('val', 123);
+
+            setTimeout(function() {
+                deepEqual(changed, {val: true});
+                start();
+            }, 50);
+        }, 50);
+    });
+
     module('nested properties');
 
     test('setting/getting nested property', function() {

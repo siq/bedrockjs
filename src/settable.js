@@ -190,6 +190,9 @@ define([
 
                     if (valuesArentEqual ||
 
+                        // force update to be sent even if there's no changes
+                        opts.update ||
+
                         // if the prop doesnt exist, but is being set to undef
                         // (necessary so `.has()` behaves correctly)
                         !props.hasOwnProperty(prop)) {

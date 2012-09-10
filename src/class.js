@@ -38,7 +38,7 @@ define([
         }
     };
 
-    var Class = function() {};
+    function Class() {}
 
     Class.nestedProp = function(object, name, value) {
         var context = object, nesting = name.split("."), index, item,
@@ -114,13 +114,14 @@ define([
 
 
         constructor.prototype = prototype;
-        constructor.constructor = constructor;
+        constructor.prototype.constructor = constructor;
+        constructor.__super__ = this;
         constructor.extend = extend;
         
-        if(prototype.__new__) {
-            prototype.__new__(constructor, this, prototype, mixins);
+        if (base.__new__) {
+            base.__new__(constructor, this, prototype, mixins);
         }
-        if(mixins) {
+        if (mixins) {
             for(i = mixins.length - 1; i >= 0; i--) {
                 mixin = mixins[i];
                 if (mixin.__mixin__) {

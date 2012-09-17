@@ -316,6 +316,30 @@ define([
         }, 50);
     });
 
+    module('delete');
+
+    test('simple deletion of a property', function() {
+        var m = MyClass().set({foo: 'bar'});
+        ok(m.has('foo'), 'property should be present after set');
+        m.set({foo: undefined});
+        ok(m.has('foo'), 'property should be present after setting to undef');
+        m.del('foo');
+        ok(!m.has('foo'), 'property shouldn\'t be present after deletion');
+    });
+
+    test('deletion of a nested property', function() {
+        var m = MyClass().set('foo.bar', 'bar');
+        ok(m.has('foo.bar'), 'property should be present after set');
+        ok(m._settableProperties.foo.hasOwnProperty('bar'), 'nesting');
+        m.set('foo.bar', undefined);
+        ok(m.has('foo'), 'property should be present after setting to undef');
+        ok(m._settableProperties.foo.hasOwnProperty('bar'), 'nesting');
+        m.del('foo.bar');
+        equal(m.has('foo.bar'), false,
+            'property shouldn\'t be present after deletion');
+        ok(!m._settableProperties.foo.hasOwnProperty('bar'), 'nesting');
+    });
+
     start();
 });
 

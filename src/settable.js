@@ -110,6 +110,20 @@ define([
             }
         },
 
+        del: function(key, opts) {
+            var props = this._settableProperty == null?
+                this : this[this._settableProperty];
+            if (!opts || !opts.notNested) {
+                props = _nestedObj(props, key);
+                if (!props) {
+                    return this;
+                }
+                key = key.substring(key.lastIndexOf('.')+1, key.length);
+            }
+            delete props[key];
+            return this;
+        },
+
         get: function(key, opts) {
             var obj = this._settableProperty == null?
                 this : this[this._settableProperty];

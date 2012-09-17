@@ -3,6 +3,20 @@ define([
     './class'
 ], function(_, Class) {
     var _nested = Class.nestedProp,
+
+        // if you're trying to operate on some nested prop like `foo.bar.baz`,
+        // and you've got an object `{foo: {bar: {baz: 123}}}`, then this will
+        // return the `foo.bar` object.
+        _nestedObj = function(obj, propName) {
+            var i, l, split = propName.split('.'), cur = obj;
+            for (i = 0, l = split.length; i < l-1; i++) {
+                cur = cur[split[i]];
+                if (!_.isObject(cur)) {
+                    return;
+                }
+            }
+            return cur;
+        },
         areNotEquivDates = function(v1, v2) {
             if (v1 && v1.getDate && v2 && v2.getDate) {
                 return v1.toString() !== v2.toString();
@@ -99,12 +113,19 @@ define([
         get: function(key, opts) {
             var obj = this._settableProperty == null?
                 this : this[this._settableProperty];
-            return opts && opts.notNested? obj[key] : _nested(obj, key); 
+            return opts && opts.notNested? obj[key] : _nested(obj, key);
         },
 
-        has: function(key) {
+        has: function(key, opts) {
             var props = this._settableProperty == null?
                 this : this[this._settableProperty];
+            if (!opts || !opts.notNested) {
+                props = _nestedObj(props, key);
+                if (!props) {
+                    return false;
+                }
+                key = key.substring(key.lastIndexOf('.')+1, key.length);
+            }
             return props.hasOwnProperty(key);
         },
 
@@ -131,7 +152,7 @@ define([
 
         // this can be called in any of the following ways:
         //
-        //     instance.set({/* props */);
+        //     instance.set({/* props */});
         //     instance.set({/* props */}, {/* opts */});
         //     instance.set('foo', bar);
         //     instance.set('foo', bar, {/* opts */});

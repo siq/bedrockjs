@@ -284,6 +284,14 @@ define([
         equal(m.has('baz'), true);
     });
 
+    test('`has` nested property', function() {
+        var m = MyClass().set('foo.bar', 'baz');
+        ok(m._settableProperties.foo.hasOwnProperty('bar'), 'property is set');
+        ok(m.has('foo.bar'), 'has reports correctly');
+        m.set('foo', 123);
+        equal(m.has('foo.bar'), false, 'has reports correctly');
+    });
+
     module('dates');
 
     asyncTest('setting equivalent but different dates doesnt trigger', function() {
@@ -299,7 +307,7 @@ define([
         m.on('change', function() {
             triggered = true;
         });
-        
+
         m.set('created', d2.toDate());
 
         setTimeout(function() {

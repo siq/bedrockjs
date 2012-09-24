@@ -116,7 +116,7 @@ define([
         constructor.prototype = prototype;
         constructor.prototype.constructor = constructor;
         constructor.__super__ = this;
-        constructor.extend = extend;
+        constructor.extend = this.extend;
         
         if (base.__new__) {
             base.__new__(constructor, this, prototype, mixins);

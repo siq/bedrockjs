@@ -138,10 +138,6 @@ define([
             p = _settable.propName = '_settableProperties';
         }
 
-        if (_.isString(onChange)) {
-            onChange = _settable.onChange = this[onChange];
-        }
-
         this.del = function(key, opts) {
             var props = p === null? this : this[p];
             if (!opts || !opts.notNested) {
@@ -277,7 +273,11 @@ define([
                         this.trigger(eventName, changes);
                     }
                     if (onChange) {
-                        onChange.call(this, changes, opts);
+                        if (_.isString(onChange)) {
+                            this[onChange].call(this, changes, opts);
+                        } else {
+                            onChange.call(this, changes, opts);
+                        }
                     }
                 }
                 // this._settableChanging = false;

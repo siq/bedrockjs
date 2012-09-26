@@ -232,6 +232,37 @@ define([
         instance.set({foo: 'bar'}, {sheezy: 'fo reezy'});
     });
 
+    asyncTest('setting onChange to a string then overriding it in an ancestor class', function() {
+        var instance, MyDerivedClass, changeFired = false,
+            MyClass = Class.extend({
+                onChange: function(changed, opts) {
+                    ok(false, 'should not have called "onChange" of parent class');
+                    start();
+                }
+            });
+        asSettable.call(MyClass.prototype, {onChange: 'onChange'});
+        MyDerivedClass = MyClass.extend({
+            onChange: function(changed, opts) {
+                ok(changeFired = true, 'change happened');
+                ok(this === instance, 'context is set correctly');
+                ok(changed.foo, 'changed object reflects changes');
+                equal(opts.sheezy, 'fo reezy');
+                start();
+            }
+        });
+        instance = MyDerivedClass();
+
+        setTimeout(function() {
+            if (!changeFired) {
+                ok(false, 'event wasnt triggered');
+                start();
+            }
+        }, 50);
+
+        instance.set({foo: 'bar'}, {sheezy: 'fo reezy'});
+
+    });
+
     asyncTest('setting areEqual works correctly', function() {
         var instance, v1 = {foo: 'bar'}, v2 = {foo: 'bar'}, changed = false,
             MyClass = EventableClass.extend({});

@@ -375,6 +375,18 @@ define([
         ok(!m._settableProperties.foo.hasOwnProperty('bar'), 'nesting');
     });
 
+    test('deleting a property triggers a change event', function() {
+        var count = 0, m = EventableClass().set('foo', 'bar');
+        m.on('change', function() {count++;});
+        m.del('foo');
+
+        equal(count, 1, 'change event fired');
+        equal(m._settableProperties.hasOwnProperty('foo'), false,
+            'property was deleted');
+        equal(m.previous('foo'), 'bar',
+            'deleted property shows up in previous properties');
+    });
+
     start();
 });
 

@@ -132,22 +132,42 @@ define([
             p = _settable.propName,
             eventName = _settable.eventName,
             onChange = _settable.onChange,
-            areEqual = _settable.areEqual;
+            areEqual = _settable.areEqual,
+            handleChanges = function(changes, opts) {
+                if (!opts.silent) {
+                    if (this.trigger && eventName) {
+                        this.trigger(eventName, changes);
+                    }
+                    if (onChange) {
+                        if (_.isString(onChange)) {
+                            this[onChange].call(this, changes, opts);
+                        } else {
+                            onChange.call(this, changes, opts);
+                        }
+                    }
+                }
+            };
 
         if (typeof p === 'undefined') {
             p = _settable.propName = '_settableProperties';
         }
 
         this.del = function(key, opts) {
-            var props = p === null? this : this[p];
+            var props = p === null? this : this[p], k = key, changes = {};
+            opts = opts || {};
             if (!opts || !opts.notNested) {
-                props = _nestedObj(props, key);
+                props = _nestedObj(props, k);
                 if (!props) {
                     return this;
                 }
-                key = key.substring(key.lastIndexOf('.')+1, key.length);
+                k = k.substring(k.lastIndexOf('.')+1, k.length);
             }
-            delete props[key];
+            if (props.hasOwnProperty(k)) {
+                _nested(this._settablePreviousProperties, key, props[k]);
+                delete props[k];
+                changes[key] = true;
+                handleChanges.call(this, changes, opts);
+            }
             return this;
         };
 
@@ -268,17 +288,8 @@ define([
             }
 
             // if (!changing) {
-                if (changed && !opts.silent) {
-                    if (this.trigger && eventName) {
-                        this.trigger(eventName, changes);
-                    }
-                    if (onChange) {
-                        if (_.isString(onChange)) {
-                            this[onChange].call(this, changes, opts);
-                        } else {
-                            onChange.call(this, changes, opts);
-                        }
-                    }
+                if (changed) {
+                    handleChanges.call(this, changes, opts);
                 }
                 // this._settableChanging = false;
             // }

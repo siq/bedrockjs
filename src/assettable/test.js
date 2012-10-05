@@ -298,6 +298,10 @@ define([
         ok(_.isString(instance._settableProperties.foo));
         equal(instance.get('foo'), 'baz2');
         equal(instance._settableProperties.foo, 'baz2');
+
+        equal(instance.get('foo.bogus'), undefined, 'getting non-existing nested prop');
+
+
     });
 
     module('has');

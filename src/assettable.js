@@ -33,7 +33,9 @@ define([
                     if (arguments.length > 2) {
                         cur[split[i]] = next = {};
                     } else {
-                        return cur;
+                        // We would return undefined if
+                        // while getting a prop the container of the required prop we are interested in is null.
+                        return undefined;
                     }
                 }
             }
@@ -280,6 +282,7 @@ define([
                             prevProps[prop] = value;
                             props[prop] = newValue;
                         } else {
+                            // rather than assigning structures, we need to merge them for nested copy.
                             _nested(prevProps, prop, value);
                             _nested(props, prop, newValue);
                         }

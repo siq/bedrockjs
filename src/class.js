@@ -64,6 +64,9 @@ define([
     
     var extend = function(namespace, options) {
         var i, mixins, mixin, base = this.prototype;
+        if (!namespace) {
+            namespace = {};
+        }
         if(!options) {
             options = {};
         }

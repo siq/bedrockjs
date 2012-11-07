@@ -137,15 +137,15 @@ define([
             areEqual = _settable.areEqual,
             handleChanges = function(changes, opts) {
                 if (!opts.silent) {
-                    if (this.trigger && eventName) {
-                        this.trigger(eventName, changes);
-                    }
                     if (onChange) {
                         if (_.isString(onChange)) {
                             this[onChange].call(this, changes, opts);
                         } else {
                             onChange.call(this, changes, opts);
                         }
+                    }
+                    if (this.trigger && eventName) {
+                        this.trigger(eventName, changes);
                     }
                 }
             };

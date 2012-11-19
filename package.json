@@ -5,10 +5,10 @@
     "Aaron Stacy <astacy@storediq.com>",
     "Jordan McCoy"
   ],
-  "version": "1.0.2",
+  "version": "1.0.3",
   "dependencies": {
-    "csi": "git+ssh://git@github.com:siq/csi.git#1.0.1",
-    "siq-vendor-js": "git+ssh://git@github.com:siq/siq-vendor-js.git#1.0.1"
+    "csi": "git+ssh://git@github.com:siq/csi.git#1.0.2",
+    "siq-vendor-js": "git+ssh://git@github.com:siq/siq-vendor-js.git#1.0.2"
   },
   "csi": {
     "name": "bedrock"

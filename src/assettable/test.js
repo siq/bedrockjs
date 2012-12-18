@@ -65,6 +65,12 @@ define([
         deepEqual(instance.previous(), {foo: 'bar', baz: 'boom'});
     });
 
+    test('array properties are not merged', function() {
+        var instance = MyClass().set('foo', [1, 2, 3]).set('foo', [1, 2]);
+        deepEqual(instance.get('foo'), [1, 2]);
+        deepEqual(instance.previous('foo'), [1, 2, 3]);
+    });
+
     module('events');
 
     asyncTest('setting triggers an event', function() {

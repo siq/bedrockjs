@@ -306,8 +306,15 @@ define([
         equal(instance._settableProperties.foo, 'baz2');
 
         equal(instance.get('foo.bogus'), undefined, 'getting non-existing nested prop');
+    });
 
-
+    test('setting nested property twice to the same thing doesnt trigger change', function() {
+        var changes = [],
+            instance = EventableClass()
+            .on('change', function(changed) {
+                changes.push(changed);
+            }).set('foo.bar', 123).set('foo.bar', 123);
+        equal(changes.length, 1);
     });
 
     module('has');

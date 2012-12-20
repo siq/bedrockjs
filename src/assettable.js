@@ -261,7 +261,7 @@ define([
 
             for (prop in newProps) {
                 if (newProps.hasOwnProperty(prop)) {
-                    value = props[prop];
+                    value = this.get(prop);
                     newValue = newProps[prop];
 
                     valuesArentEqual = areEqual?
@@ -275,7 +275,7 @@ define([
 
                         // if the prop doesnt exist, but is being set to undef
                         // (necessary so `.has()` behaves correctly)
-                        !props.hasOwnProperty(prop)) {
+                        !this.has(prop)) {
 
                         changes[prop] = changed = true;
                         if (opts.notNested) {

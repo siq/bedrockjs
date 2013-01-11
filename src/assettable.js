@@ -229,18 +229,7 @@ define([
         // to disable this, set `opts.notNested` to true
         //
         this.set = function(/* arguments */) {
-            var prop, value, newValue, changed, changing, valuesArentEqual,
-                newProps = {}, opts = {}, changes = {},
-                props = p === null? this : this[p],
-                prevProps = this._settablePreviousProperties;
-
-            if (!props) {
-                props = this[p] = {};
-            }
-
-            if (!prevProps) {
-                prevProps = this._settablePreviousProperties = {};
-            }
+            var newProps = {}, opts = {};
 
             if (arguments.length === 1) {
                 newProps = arguments[0];
@@ -254,6 +243,24 @@ define([
             } else {
                 newProps[arguments[0]] = arguments[1];
                 opts = arguments[2];
+            }
+
+            return this._set(newProps, opts);
+        };
+
+        // basically just .set, but guaranteed to have user-friendly args.
+        // this should make it easier to override the .set functionality
+        this._set = function(newProps, opts) {
+            var prop, value, newValue, changed, changing, valuesArentEqual,
+                changes = {}, props = p === null? this : this[p],
+                prevProps = this._settablePreviousProperties;
+
+            if (!props) {
+                props = this[p] = {};
+            }
+
+            if (!prevProps) {
+                prevProps = this._settablePreviousProperties = {};
             }
 
             // changing = this._settableChanging;

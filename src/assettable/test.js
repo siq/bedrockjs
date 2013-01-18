@@ -317,6 +317,14 @@ define([
         equal(changes.length, 1);
     });
 
+    // test('setting mulitple nested properties', function() {
+    //     var instance = MyClass();
+    //     instance.set({bar: {boom: 456}});
+    //     instance.set({bar: {baz: 789}});
+    //     equal(instance.get('bar.boom'), 456);
+    //     equal(instance.get('bar.baz'), 789);
+    // });
+
     module('has');
 
     test('basic `has` functionality', function() {

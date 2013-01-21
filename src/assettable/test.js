@@ -1,11 +1,12 @@
 /*global test, asyncTest, ok, equal, deepEqual, start, module, strictEqual, notStrictEqual, raises*/
 define([
+    'vendor/jquery',
     'vendor/underscore',
     'vendor/moment',
     './../class',
     './../events',
     './../assettable'
-], function(_, moment, Class, Eventable, asSettable) {
+], function($, _, moment, Class, Eventable, asSettable) {
     var MyClass = Class.extend({}),
         EventableClass = Class.extend({}, {mixins: [Eventable]});
 
@@ -317,13 +318,22 @@ define([
         equal(changes.length, 1);
     });
 
-    // test('setting mulitple nested properties', function() {
-    //     var instance = MyClass();
-    //     instance.set({bar: {boom: 456}});
-    //     instance.set({bar: {baz: 789}});
-    //     equal(instance.get('bar.boom'), 456);
-    //     equal(instance.get('bar.baz'), 789);
-    // });
+    test('setting multiple nested properties', function() {
+        var instance = MyClass();
+        instance.set({bar: {boom: 456}});
+        instance.set({bar: {baz: 789}});
+        equal(instance.get('bar.boom'), 456);
+        equal(instance.get('bar.baz'), 789);
+    });
+
+    test('setting multiple pre-flattened properties', function() {
+        var instance = MyClass();
+        instance.set({'foo.bar': 123, 'baz.boom': 456});
+        equal(instance.get('foo.bar'), 123);
+        equal(instance.get('baz.boom'), 456);
+        deepEqual(instance._settableProperties,
+            {foo: {bar: 123}, baz: {boom: 456}});
+    });
 
     module('has');
 
@@ -410,6 +420,40 @@ define([
             'property was deleted');
         equal(m.previous('foo'), 'bar',
             'deleted property shows up in previous properties');
+    });
+
+    module('flattened');
+
+    test('flattened converts to flat key value object correctly', function() {
+        deepEqual(asSettable.flattened({
+            foo: 123,
+            bar: {
+                baz: 456,
+                boom: {
+                    blow: 789,
+                    baboom: 101112
+                }
+            },
+            bow: 131415
+        }), {
+            foo: 123,
+            'bar.baz': 456,
+            'bar.boom.blow': 789,
+            'bar.boom.baboom': 101112,
+            'bow': 131415
+        });
+
+        deepEqual(asSettable.flattened({foo: 123, bar: 456}),
+            {foo: 123, bar: 456});
+    });
+
+    test('flattened handles undefined', function() {
+        equal(asSettable.flattened(undefined), undefined);
+    });
+
+    test('flattened handles already flattened object', function() {
+        var o = {'foo.bar': 'baz'};
+        deepEqual(asSettable.flattened(o), $.extend(true, {}, o));
     });
 
     start();

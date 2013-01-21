@@ -1,50 +1,87 @@
 define([
+    'vendor/jquery',
     'vendor/underscore'
-], function(_) {
-    var areNotEquivDates = function(v1, v2) {
-            if (v1 && v1.getDate && v2 && v2.getDate) {
-                return v1.toString() !== v2.toString();
-            }
-            return true;
-        },
+], function($, _) {
+    var isObject = _.isObject, isPlainObject = $.isPlainObject;
 
-        // if you're trying to operate on some nested prop like `foo.bar.baz`,
-        // and you've got an object `{foo: {bar: {baz: 123}}}`, then this will
-        // return the `foo.bar` object.
-        _nestedObj = function(obj, propName) {
-            var i, l, split = propName.split('.'), cur = obj;
-            for (i = 0, l = split.length; i < l-1; i++) {
-                cur = cur[split[i]];
-                if (!_.isObject(cur)) {
+    function areNotEquivDates(v1, v2) {
+        if (v1 && v1.getDate && v2 && v2.getDate) {
+            return v1.toString() !== v2.toString();
+        }
+        return true;
+    }
+
+    // if you're trying to operate on some nested prop like `foo.bar.baz`, and
+    // you've got an object `{foo: {bar: {baz: 123}}}`, then this will return
+    // the `foo.bar` object.
+    function nestedObj(obj, propName) {
+        var i, l, split = propName.split('.'), cur = obj;
+        for (i = 0, l = split.length; i < l-1; i++) {
+            cur = cur[split[i]];
+            if (!isObject(cur)) {
+                return;
+            }
+        }
+        return cur;
+    }
+
+    // if you've got an object `{foo: {bar: {baz: 123}}}`, this will return
+    // some nested prop like `foo.bar.baz`
+    function nested(obj, propName, newValue) {
+        var i, l, cur, next = obj, split = propName.split('.');
+        for (i = 0, l = split.length; i < l-1; i++) {
+            cur = next;
+            next = cur[split[i]];
+            if (!isObject(next)) {
+                if (arguments.length > 2) {
+                    cur[split[i]] = next = {};
+                } else {
+                    // We would return undefined if while getting a prop the
+                    // container of the required prop we are interested in is
+                    // null.
                     return;
                 }
             }
-            return cur;
-        },
+        }
+        if (arguments.length > 2) {
+            next[split[split.length-1]] = newValue;
+        } else {
+            return next[split[split.length-1]];
+        }
+    }
 
-        // if you've got an object `{foo: {bar: {baz: 123}}}`, this will return
-        // some nested prop like `foo.bar.baz`
-        _nested = function(obj, propName, newValue) {
-            var i, l, cur, next = obj, split = propName.split('.');
-            for (i = 0, l = split.length; i < l-1; i++) {
-                cur = next;
-                next = cur[split[i]];
-                if (!_.isObject(next)) {
-                    if (arguments.length > 2) {
-                        cur[split[i]] = next = {};
-                    } else {
-                        // We would return undefined if
-                        // while getting a prop the container of the required prop we are interested in is null.
-                        return undefined;
+    // translate something like {foo: {bar: 123}} to {'foo.bar': 123}
+    function flattened(obj) {
+        var k, prop, keys = [], item, result = {};
+        function getProp(o, keyList) {
+            var i = 0, l = keyList.length;
+            while (i < l) {
+                o = o[keyList[i++]];
+            }
+            return o;
+        }
+        if (!obj) {
+            return obj;
+        }
+        for (k in obj) {
+            if (obj.hasOwnProperty(k)) {
+                keys.push([k]);
+            }
+        }
+        while ((prop = keys.shift())) {
+            item = getProp(obj, prop);
+            if (isPlainObject(item)) {
+                for (k in item) {
+                    if (item.hasOwnProperty(k)) {
+                        keys.unshift(prop.concat([k]));
                     }
                 }
-            }
-            if (arguments.length > 2) {
-                next[split[split.length-1]] = newValue;
             } else {
-                return next[split[split.length-1]];
+                result[prop.join('.')] = item;
             }
-        };
+        }
+        return result;
+    }
 
     // # asSettable
     //
@@ -126,7 +163,7 @@ define([
     // if you need to change the comparison function used to determine if two
     // different values are equal, use the `areEqual` property.
     //
-    return function(options) {
+    function asSettable(options) {
         // we use the _settable prop as a proxy object so that when you mixin
         // to a class, then mixin again to a child class, you retain the
         // non-overriden options of the parent class' mixin.
@@ -135,10 +172,11 @@ define([
             eventName = _settable.eventName,
             onChange = _settable.onChange,
             areEqual = _settable.areEqual,
+            isString = _.isString,
             handleChanges = function(changes, opts) {
                 if (!opts.silent) {
                     if (onChange) {
-                        if (_.isString(onChange)) {
+                        if (isString(onChange)) {
                             this[onChange].call(this, changes, opts);
                         } else {
                             onChange.call(this, changes, opts);
@@ -158,14 +196,14 @@ define([
             var props = p === null? this : this[p], k = key, changes = {};
             opts = opts || {};
             if (!opts || !opts.notNested) {
-                props = _nestedObj(props, k);
+                props = nestedObj(props, k);
                 if (!props) {
                     return this;
                 }
                 k = k.substring(k.lastIndexOf('.')+1, k.length);
             }
             if (props.hasOwnProperty(k)) {
-                _nested(this._settablePreviousProperties, key, props[k]);
+                nested(this._settablePreviousProperties, key, props[k]);
                 delete props[k];
                 changes[key] = true;
                 handleChanges.call(this, changes, opts);
@@ -175,13 +213,13 @@ define([
 
         this.get = function(key, opts) {
             var obj = p === null? this : this[p];
-            return opts && opts.notNested? obj[key] : _nested(obj, key);
+            return opts && opts.notNested? obj[key] : nested(obj, key);
         };
 
         this.has = function(key, opts) {
             var props = p === null? this : this[p];
             if (!opts || !opts.notNested) {
-                props = _nestedObj(props, key);
+                props = nestedObj(props, key);
                 if (!props) {
                     return false;
                 }
@@ -206,7 +244,7 @@ define([
         //     instance.prop(/* any other args */)      // => set
         //
         this.prop = function(/* arguments */) {
-            var isGet = arguments.length === 1 && _.isString(arguments[0]);
+            var isGet = arguments.length === 1 && isString(arguments[0]);
             return this[isGet? 'get' : 'set']
                 .apply(this, arguments);
         };
@@ -234,7 +272,7 @@ define([
             if (arguments.length === 1) {
                 newProps = arguments[0];
             } else if (arguments.length === 2) {
-                if (_.isString(arguments[0])) {
+                if (isString(arguments[0])) {
                     newProps[arguments[0]] = arguments[1];
                 } else {
                     newProps = arguments[0];
@@ -251,8 +289,9 @@ define([
         // basically just .set, but guaranteed to have user-friendly args.
         // this should make it easier to override the .set functionality
         this._set = function(newProps, opts) {
-            var prop, value, newValue, changed, changing, valuesArentEqual,
-                changes = {}, props = p === null? this : this[p],
+            var i, keys, prop, value, newValue, changed, changing,
+                valuesArentEqual, changes = {},
+                props = p === null? this : this[p],
                 prevProps = this._settablePreviousProperties;
 
             if (!props) {
@@ -263,8 +302,7 @@ define([
                 prevProps = this._settablePreviousProperties = {};
             }
 
-            // changing = this._settableChanging;
-            // this._settableChanging = true;
+            newProps = opts.notNested? newProps : flattened(newProps);
 
             for (prop in newProps) {
                 if (newProps.hasOwnProperty(prop)) {
@@ -289,21 +327,23 @@ define([
                             prevProps[prop] = value;
                             props[prop] = newValue;
                         } else {
-                            _nested(prevProps, prop, value);
-                            _nested(props, prop, newValue);
+                            nested(prevProps, prop, value);
+                            nested(props, prop, newValue);
                         }
                     }
                 }
             }
 
-            // if (!changing) {
-                if (changed) {
-                    handleChanges.call(this, changes, opts);
-                }
-                // this._settableChanging = false;
-            // }
+            if (changed) {
+                handleChanges.call(this, changes, opts);
+            }
 
             return this;
         };
-    };
+    }
+
+    asSettable.nested = nested;
+    asSettable.flattened = flattened;
+
+    return asSettable;
 });

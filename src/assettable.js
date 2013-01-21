@@ -286,10 +286,11 @@ define([
             return this._set(newProps, opts);
         };
 
-        // basically just .set, but guaranteed to have user-friendly args.
-        // this should make it easier to override the .set functionality
+        // basically just .set, but guaranteed to have an argument pattern of
+        // (new properties, options). this should make it easier to override
+        // the .set functionality
         this._set = function(newProps, opts) {
-            var i, keys, prop, value, newValue, changed, changing,
+            var i, keys, prop, value, newValue, changed, changing, thisChanged,
                 valuesArentEqual, changes = {},
                 props = p === null? this : this[p],
                 prevProps = this._settablePreviousProperties;
@@ -322,13 +323,8 @@ define([
                         // (necessary so `.has()` behaves correctly)
                         !this.has(prop)) {
 
-                        changes[prop] = changed = true;
-                        if (opts.notNested) {
-                            prevProps[prop] = value;
-                            props[prop] = newValue;
-                        } else {
-                            nested(prevProps, prop, value);
-                            nested(props, prop, newValue);
+                        if (this._setOne(prop, newValue, value, opts)) {
+                            changes[prop] = changed = true;
                         }
                     }
                 }
@@ -339,6 +335,21 @@ define([
             }
 
             return this;
+        };
+
+        // provides an easy way to override the setting of individual
+        // properties
+        this._setOne = function(prop, newValue, currentValue, opts) {
+            var props = p === null? this : this[p],
+                prevProps = this._settablePreviousProperties;
+            if (opts.notNested) {
+                prevProps[prop] = currentValue;
+                props[prop] = newValue;
+            } else {
+                nested(prevProps, prop, currentValue);
+                nested(props, prop, newValue);
+            }
+            return true;
         };
     }
 

@@ -456,6 +456,43 @@ define([
         deepEqual(asSettable.flattened(o), $.extend(true, {}, o));
     });
 
+    module('overriding');
+
+    test('_setOne can be overridden to cancel setting certain props', function() {
+        var triggered, MyOverriddenClass = EventableClass.extend({
+                _setOne: function(prop, newValue, currentValue, opts) {
+                    if (prop !== 'foo.bar' && prop !== 'baz') {
+                        return this._super.apply(this, arguments);
+                    }
+                }
+            }),
+            m = MyOverriddenClass().on('change', function(evtName, changes) {
+                deepEqual(changes, {'foo.boom': true, bow: true});
+                triggered = true;
+            });
+
+        m.set({
+                foo: {
+                    bar: 123,
+                    boom: 456
+                },
+                baz: 789,
+                bow: 101112
+            });
+
+        deepEqual(m._settableProperties, {
+            foo: {
+                boom: 456
+            },
+            bow: 101112
+        });
+        ok(m.get('foo.bar') == null, 'foo.bar wasnt set');
+        equal(m.get('foo.boom'), 456, 'foo.boom was set');
+        ok(m.get('baz') == null, 'baz wasnt set');
+        ok(m.get('bow'), 101112, 'bow was set');
+        ok(triggered);
+    });
+
     start();
 });
 

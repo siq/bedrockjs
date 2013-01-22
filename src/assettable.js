@@ -171,6 +171,7 @@ define([
             p = _settable.propName,
             eventName = _settable.eventName,
             onChange = _settable.onChange,
+            onError = _settable.onError,
             areEqual = _settable.areEqual,
             isString = _.isString,
             handleChanges = function(changes, opts) {
@@ -184,6 +185,17 @@ define([
                     }
                     if (this.trigger && eventName) {
                         this.trigger(eventName, changes);
+                    }
+                }
+            },
+            handleErrors = function(errors, opts) {
+                if (!opts.silent) {
+                    if (onError) {
+                        if (isString(onError)) {
+                            this[onError].call(this, errors, opts);
+                        } else {
+                            onError.call(this, errors, opts);
+                        }
                     }
                 }
             };
@@ -290,8 +302,8 @@ define([
         // (new properties, options). this should make it easier to override
         // the .set functionality
         this._set = function(newProps, opts) {
-            var i, keys, prop, value, newValue, changed, changing, thisChanged,
-                valuesArentEqual, changes = {},
+            var i, keys, prop, value, newValue, changing, thisChanged, e,
+                valuesArentEqual, changes, errors,
                 props = p === null? this : this[p],
                 prevProps = this._settablePreviousProperties;
 
@@ -323,15 +335,21 @@ define([
                         // (necessary so `.has()` behaves correctly)
                         !this.has(prop)) {
 
-                        if (this._setOne(prop, newValue, value, opts)) {
-                            changes[prop] = changed = true;
+                        if ((e = this._setOne(prop, newValue, value, opts))) {
+                            (errors = errors || {})[prop] = e;
+                        } else {
+                            (changes = changes || {})[prop] = true;
                         }
                     }
                 }
             }
 
-            if (changed) {
+            if (changes) {
                 handleChanges.call(this, changes, opts);
+            }
+
+            if (errors) {
+                handleErrors.call(this, errors, opts);
             }
 
             return this;
@@ -349,7 +367,6 @@ define([
                 nested(prevProps, prop, currentValue);
                 nested(props, prop, newValue);
             }
-            return true;
         };
     }
 

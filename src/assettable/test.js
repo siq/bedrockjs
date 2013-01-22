@@ -461,9 +461,10 @@ define([
     test('_setOne can be overridden to cancel setting certain props', function() {
         var triggered, MyOverriddenClass = EventableClass.extend({
                 _setOne: function(prop, newValue, currentValue, opts) {
-                    if (prop !== 'foo.bar' && prop !== 'baz') {
-                        return this._super.apply(this, arguments);
+                    if (prop === 'foo.bar' || prop === 'baz') {
+                        return new Error();
                     }
+                    return this._super.apply(this, arguments);
                 }
             }),
             m = MyOverriddenClass().on('change', function(evtName, changes) {
@@ -491,6 +492,86 @@ define([
         ok(m.get('baz') == null, 'baz wasnt set');
         ok(m.get('bow'), 101112, 'bow was set');
         ok(triggered);
+    });
+
+    module('error handling');
+
+    test('onError is called when an error occurs', function() {
+        var changeFired, errorFired, MyErrorClass, m,
+            MyBaseErrorClass = Class.extend({
+                onChange: function(changes, opts) {
+                    changeFired = true;
+                    deepEqual(changes, {
+                        'jay.z':            true, // dat?
+                        'notorious.b.i.g':  true,
+                        'fiddy.cent':       true,
+                        tupac:              true
+                    });
+                },
+                onError: function(errors, opts) {
+                    errorFired = true;
+                    deepEqual(errors, {
+                        'dr.dre':       'dr.dre not allowed',
+                        'black.street': 'black.street not allowed'
+                    });
+                }
+            });
+
+        asSettable.call(MyBaseErrorClass.prototype, {
+            onChange: 'onChange',
+            onError: 'onError'
+        });
+
+        MyErrorClass = MyBaseErrorClass.extend({
+            _setOne: function(prop, newValue, currentValue, opts) {
+                if (prop === 'dr.dre' || prop === 'black.street') {
+                    return prop + ' not allowed';
+                }
+                return this._super.apply(this, arguments);
+            }
+        });
+
+        m = MyErrorClass();
+        m.set({
+            dr: {dre:               'its goin down, fade to blackstreet'},
+            black: {street:         'getting paid is a forte, each and every day'},
+            jay: {z:                'got some dirt on my shoulder, could u brush it off for me?'},
+            notorious: {b: {i: {g:  'timbs for my hooligans in brooklyn'}}},
+            fiddy: {cent:           'sunny days wouldnt b special if it wanst for rain'},
+            tupac:                  'west side when we ride, come equipped with game'
+        });
+        ok(changeFired);
+        ok(errorFired);
+    });
+
+    test('onError is not called when an error doesnt occur', function() {
+        var changeFired, errorFired, m,
+            MyBaseErrorClass = Class.extend({
+                onChange: function(changes, opts) {
+                    changeFired = true;
+                    deepEqual(changes, {
+                        'frank.sinatra':    true,
+                        'ray.charles':      true
+                    });
+                },
+                onError: function(errors, opts) {
+                    errorFired = true;
+                }
+            });
+
+        asSettable.call(MyBaseErrorClass.prototype, {
+            onChange: 'onChange',
+            onError: 'onError'
+        });
+
+        m = MyBaseErrorClass();
+
+        m.set({
+            frank: {sinatra:    'its a use u abuse u town until youre down town'},
+            ray: {charles:      'when yo friends turn dey back on u ill b here just to see u thru'}
+        });
+        ok(changeFired);
+        ok(!errorFired);
     });
 
     start();

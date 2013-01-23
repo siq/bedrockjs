@@ -175,6 +175,19 @@ define([
             areEqual = _settable.areEqual,
             isString = _.isString,
             handleChanges = function(changes, opts) {
+                if (!opts.notNested) {
+                    // if 'foo.bar' changed then changes['foo.bar'] AND
+                    // changes.foo should be true
+                    changes = _.reduce(changes, function(changes, value, key) {
+                        var split = key.split('.');
+                        changes[key] = true;
+                        while (split.length > 1) {
+                            changes[split[0]] = true;
+                            split.splice(0, 2, split[0] + '.' + split[1]);
+                        }
+                        return changes;
+                    }, {});
+                }
                 if (!opts.silent) {
                     if (onChange) {
                         if (isString(onChange)) {

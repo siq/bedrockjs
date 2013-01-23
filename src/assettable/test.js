@@ -335,6 +335,36 @@ define([
             {foo: {bar: 123}, baz: {boom: 456}});
     });
 
+    test('changes object lists foo.bar AND foo as changed when foo.bar is set', function() {
+        var changed,
+            instance = EventableClass().on('change', function(name, changes) {
+                changed = true;
+                ok(changes.foo, 'foo listed in changes');
+                ok(changes['foo.bar'], 'foo.bar listed in changes');
+                ok(changes['foo.bar.baz'], 'foo.bar.baz listed in changes');
+                deepEqual(changes, {foo: true, 'foo.bar': true, 'foo.bar.baz': true});
+            });
+        instance.set('foo.bar.baz', 123);
+        deepEqual(instance._settableProperties, {foo: {bar: {baz: 123}}});
+        equal(instance.get('foo.bar.baz'), 123);
+        ok(changed);
+    });
+
+    test('changes object only lists foo.bar when opts.notNested is set', function() {
+        var changed,
+            instance = EventableClass().on('change', function(name, changes) {
+                changed = true;
+                ok(!changes.foo, 'foo not listed in changes');
+                ok(!changes['foo.bar'], 'foo.bar not listed in changes');
+                ok(changes['foo.bar.baz'], 'foo.bar.baz listed in changes');
+                deepEqual(changes, {'foo.bar.baz': true});
+            });
+        instance.set('foo.bar.baz', 123, {notNested: true});
+        deepEqual(instance._settableProperties, {'foo.bar.baz': 123});
+        equal(instance.get('foo.bar.baz', {notNested: true}), 123);
+        ok(changed);
+    });
+
     module('has');
 
     test('basic `has` functionality', function() {
@@ -468,7 +498,7 @@ define([
                 }
             }),
             m = MyOverriddenClass().on('change', function(evtName, changes) {
-                deepEqual(changes, {'foo.boom': true, bow: true});
+                deepEqual(changes, {foo: true, 'foo.boom': true, bow: true});
                 triggered = true;
             });
 
@@ -502,10 +532,10 @@ define([
                 onChange: function(changes, opts) {
                     changeFired = true;
                     deepEqual(changes, {
-                        'jay.z':            true, // dat?
-                        'notorious.b.i.g':  true,
-                        'fiddy.cent':       true,
-                        tupac:              true
+                        tupac:              true, //dat?
+                        'notorious.b.i.g':  true, notorious:    true, 'notorious.b': true, 'notorious.b.i': true,
+                        'fiddy.cent':       true, fiddy:        true,
+                        'jay.z':            true, jay:          true
                     });
                 },
                 onError: function(errors, opts) {
@@ -550,8 +580,8 @@ define([
                 onChange: function(changes, opts) {
                     changeFired = true;
                     deepEqual(changes, {
-                        'frank.sinatra':    true,
-                        'ray.charles':      true
+                        'frank.sinatra':    true, frank:    true,
+                        'ray.charles':      true, ray:      true,
                     });
                 },
                 onError: function(errors, opts) {

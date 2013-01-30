@@ -315,7 +315,7 @@ define([
         // (new properties, options). this should make it easier to override
         // the .set functionality
         this._set = function(newProps, opts) {
-            var i, keys, prop, value, newValue, changing, thisChanged, e,
+            var i, keys, prop, value, newValue, changing, thisChanged, e, ctrl,
                 valuesArentEqual, changes, errors,
                 props = p === null? this : this[p],
                 prevProps = this._settablePreviousProperties;
@@ -348,9 +348,11 @@ define([
                         // (necessary so `.has()` behaves correctly)
                         !this.has(prop)) {
 
-                        if ((e = this._setOne(prop, newValue, value, opts))) {
-                            (errors = errors || {})[prop] = e;
-                        } else {
+                        this._setOne(prop, newValue, value, opts, ctrl = {});
+
+                        if (ctrl.error) {
+                            (errors = errors || {})[prop] = ctrl.error;
+                        } else if (!ctrl.silent) {
                             (changes = changes || {})[prop] = true;
                         }
                     }

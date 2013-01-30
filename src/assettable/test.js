@@ -490,9 +490,10 @@ define([
 
     test('_setOne can be overridden to cancel setting certain props', function() {
         var triggered, MyOverriddenClass = EventableClass.extend({
-                _setOne: function(prop, newValue, currentValue, opts) {
+                _setOne: function(prop, newValue, currentValue, opts, ctrl) {
                     if (prop === 'foo.bar' || prop === 'baz') {
-                        return new Error();
+                        ctrl.error = new Error();
+                        return;
                     }
                     return this._super.apply(this, arguments);
                 }
@@ -524,6 +525,60 @@ define([
         ok(triggered);
     });
 
+    test('_setOne can be overridden to silence changes', function() {
+        var changes = [], MyOverriddenClass = EventableClass.extend({
+                _setOne: function(prop, newValue, currentValue, opts, ctrl) {
+                    if (prop === 'foo.bar' || prop === 'baz') {
+                        ctrl.silent = true;
+                        return;
+                    }
+                    return this._super.apply(this, arguments);
+                }
+            }),
+            m = MyOverriddenClass().on('change', function(evtName, changed) {
+                changes.push(changed);
+            });
+
+        m.set({
+                foo: {
+                    bar: 123,
+                    boom: 456
+                },
+                baz: 789,
+                bow: 101112
+            });
+        deepEqual(m._settableProperties, {
+            foo: {
+                boom: 456
+            },
+            bow: 101112
+        });
+        ok(m.get('foo.bar') == null, 'foo.bar wasnt set');
+        equal(m.get('foo.boom'), 456, 'foo.boom was set');
+        ok(m.get('baz') == null, 'baz wasnt set');
+        ok(m.get('bow'), 101112, 'bow was set');
+        equal(changes.length, 1);
+        deepEqual(changes[0], {foo: true, 'foo.boom': true, bow: true});
+
+        m.set('foo.bar', 'danger');
+        deepEqual(m._settableProperties, {
+            foo: {
+                boom: 456
+            },
+            bow: 101112
+        });
+        equal(changes.length, 1);
+
+        m.set({foo: {bar: 'danger'}, baz: 'will-bo'});
+        deepEqual(m._settableProperties, {
+            foo: {
+                boom: 456
+            },
+            bow: 101112
+        });
+        equal(changes.length, 1);
+    });
+
     module('error handling');
 
     test('onError is called when an error occurs', function() {
@@ -553,9 +608,10 @@ define([
         });
 
         MyErrorClass = MyBaseErrorClass.extend({
-            _setOne: function(prop, newValue, currentValue, opts) {
+            _setOne: function(prop, newValue, currentValue, opts, ctrl) {
                 if (prop === 'dr.dre' || prop === 'black.street') {
-                    return prop + ' not allowed';
+                    ctrl.error = prop + ' not allowed';
+                    return;
                 }
                 return this._super.apply(this, arguments);
             }

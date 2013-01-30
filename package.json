@@ -5,7 +5,7 @@
     "Aaron Stacy <astacy@storediq.com>",
     "Jordan McCoy"
   ],
-  "version": "1.0.14",
+  "version": "1.0.15",
   "dependencies": {
     "csi": "git+ssh://git@github.com:siq/csi.git#1.0.6",
     "siq-vendor-js": "git+ssh://git@github.com:siq/siq-vendor-js.git#1.0.7"

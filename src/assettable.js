@@ -71,7 +71,7 @@ define([
         }
         while ((prop = keys.shift())) {
             item = getProp(obj, prop);
-            if (ipo(item)) {
+            if (ipo? ipo(item, isPlainObject) : isPlainObject(item)) {
                 for (k in item) {
                     if (item.hasOwnProperty(k)) {
                         keys.unshift(prop.concat([k]));

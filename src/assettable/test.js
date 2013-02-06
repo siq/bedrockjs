@@ -498,11 +498,11 @@ define([
             o2 = {baz: {boom: 456}},
             changes = [];
         asSettable.call(MyClass2.prototype, {
-            isPlainObject: function(o) {
+            isPlainObject: function(o, isPlainObject) {
                 if (o.foobar) {
                     return false;
                 }
-                return $.isPlainObject(o);
+                return isPlainObject(o);
             }
         });
 

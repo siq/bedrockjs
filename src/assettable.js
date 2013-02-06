@@ -51,8 +51,9 @@ define([
     }
 
     // translate something like {foo: {bar: 123}} to {'foo.bar': 123}
-    function flattened(obj) {
+    function flattened(obj, ipo) {
         var k, prop, keys = [], item, result = {};
+        ipo = ipo || isPlainObject;
         function getProp(o, keyList) {
             var i = 0, l = keyList.length;
             while (i < l) {
@@ -70,7 +71,7 @@ define([
         }
         while ((prop = keys.shift())) {
             item = getProp(obj, prop);
-            if (isPlainObject(item)) {
+            if (ipo(item)) {
                 for (k in item) {
                     if (item.hasOwnProperty(k)) {
                         keys.unshift(prop.concat([k]));
@@ -174,6 +175,7 @@ define([
             onError = _settable.onError,
             areEqual = _settable.areEqual,
             isString = _.isString,
+            isPlainObject = _settable.isPlainObject,
             handleChanges = function(changes, opts) {
                 if (!opts.notNested) {
                     // if 'foo.bar' changed then changes['foo.bar'] AND
@@ -328,7 +330,8 @@ define([
                 prevProps = this._settablePreviousProperties = {};
             }
 
-            newProps = opts.notNested? newProps : flattened(newProps);
+            newProps = opts.notNested?
+                newProps : flattened(newProps, isPlainObject);
 
             for (prop in newProps) {
                 if (newProps.hasOwnProperty(prop)) {

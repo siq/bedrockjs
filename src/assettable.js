@@ -2,7 +2,7 @@ define([
     'vendor/jquery',
     'vendor/underscore'
 ], function($, _) {
-    var isObject = _.isObject, isPlainObject = $.isPlainObject;
+    var isObject = _.isObject, $isPlainObject = $.isPlainObject;
 
     function areNotEquivDates(v1, v2) {
         if (v1 && v1.getDate && v2 && v2.getDate) {
@@ -51,8 +51,9 @@ define([
     }
 
     // translate something like {foo: {bar: 123}} to {'foo.bar': 123}
-    function flattened(obj) {
-        var k, prop, keys = [], item, result = {};
+    function flattened(obj, isPlainObject) {
+        var k, prop, plain, keys = [], item, result = {};
+        isPlainObject = isPlainObject || $isPlainObject;
         function getProp(o, keyList) {
             var i = 0, l = keyList.length;
             while (i < l) {
@@ -70,7 +71,9 @@ define([
         }
         while ((prop = keys.shift())) {
             item = getProp(obj, prop);
-            if (isPlainObject(item)) {
+            plain = isPlainObject?
+                isPlainObject(item, $isPlainObject) : $isPlainObject(item);
+            if (plain) {
                 for (k in item) {
                     if (item.hasOwnProperty(k)) {
                         keys.unshift(prop.concat([k]));
@@ -174,6 +177,7 @@ define([
             onError = _settable.onError,
             areEqual = _settable.areEqual,
             isString = _.isString,
+            isPlainObject = _settable.isPlainObject,
             handleChanges = function(changes, opts) {
                 if (!opts.notNested) {
                     // if 'foo.bar' changed then changes['foo.bar'] AND
@@ -328,7 +332,8 @@ define([
                 prevProps = this._settablePreviousProperties = {};
             }
 
-            newProps = opts.notNested? newProps : flattened(newProps);
+            newProps = opts.notNested?
+                newProps : flattened(newProps, isPlainObject);
 
             for (prop in newProps) {
                 if (newProps.hasOwnProperty(prop)) {

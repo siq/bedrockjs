@@ -8,10 +8,12 @@ define([
     './../assettable'
 ], function($, _, moment, Class, Eventable, asSettable) {
     var MyClass = Class.extend({}),
-        EventableClass = Class.extend({}, {mixins: [Eventable]});
+        EventableClass = Class.extend({}, {mixins: [Eventable]}),
+        UpdateableClass = MyClass.extend({change: function() {}});
 
     asSettable.call(MyClass.prototype);
     asSettable.call(EventableClass.prototype, {eventName: 'change'});
+    asSettable.call(UpdateableClass.prototype, {onChange: 'update'});
 
     module('basic functionality');
 
@@ -484,6 +486,36 @@ define([
     test('flattened handles already flattened object', function() {
         var o = {'foo.bar': 'baz'};
         deepEqual(asSettable.flattened(o), $.extend(true, {}, o));
+    });
+
+    test('overriding isPlainObject', function() {
+        var m, MyClass2 = UpdateableClass.extend({
+                update: function(changed) {
+                    changes.push(changed);
+                }
+            }),
+            o1 = {foobar: true, baz: {boom: 123}},
+            o2 = {baz: {boom: 456}},
+            changes = [];
+        asSettable.call(MyClass2.prototype, {
+            isPlainObject: function(o, isPlainObject) {
+                if (o.foobar) {
+                    return false;
+                }
+                return isPlainObject(o);
+            }
+        });
+
+        m = MyClass2();
+        m.set({o1: o1});
+        deepEqual(changes, [{o1: true}]);
+        ok(m.get('o1') === o1, 'original object preserved');
+        m.set({o2: o2});
+        deepEqual(changes, [
+            {o1: true},
+            {o2: true, 'o2.baz': true, 'o2.baz.boom': true}
+        ]);
+        ok(m.get('o2') !== o2, 'original object not preserved');
     });
 
     module('overriding');

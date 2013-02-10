@@ -2,13 +2,18 @@
   "name": "bedrockjs",
   "description": "core javascript functionality for storediq apps",
   "contributors": [
-    "Aaron Stacy <astacy@storediq.com>",
-    "Jordan McCoy"
+    {
+      "name": "Aaron Stacy",
+      "email": "astacy@storediq.com"
+    },
+    {
+      "name": "Jordan McCoy"
+    }
   ],
   "version": "1.0.16",
   "dependencies": {
-    "csi": "git+ssh://git@github.com:siq/csi.git",
-    "siq-vendor-js": "git+ssh://git@github.com:siq/siq-vendor-js.git"
+    "csi": "git+ssh://git@github.com:siq/csi.git#release-7.2.1.0",
+    "siq-vendor-js": "git+ssh://git@github.com:siq/siq-vendor-js.git#release-7.2.1.0"
   },
   "csi": {
     "name": "bedrock"
@@ -17,5 +22,6 @@
   "optionalDependencies": {},
   "engines": {
     "node": "*"
-  }
+  },
+  "gitHead": "11e7c960d34e1cf1dc2e705e3b86c222847a5f4a"
 }

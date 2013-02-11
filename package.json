@@ -22,6 +22,5 @@
   "optionalDependencies": {},
   "engines": {
     "node": "*"
-  },
-  "gitHead": "11e7c960d34e1cf1dc2e705e3b86c222847a5f4a"
+  }
 }

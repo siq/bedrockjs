@@ -1,11 +1,11 @@
 /*global test, asyncTest, ok, equal, deepEqual, start, module, strictEqual, notStrictEqual, raises*/
 define([
     'vendor/jquery',
-    './../class',
+    './../../class',
+    './../../events',
     './../assettable',
-    './../events',
     './../aslistenable'
-], function($, Class, asSettable, Eventable, asListenable) {
+], function($, Class, Eventable, asSettable, asListenable) {
     var Model = Class.extend({
             onChange: function(changed) {
                 this.trigger('change', changed);

@@ -3,8 +3,8 @@ define([
     'vendor/jquery',
     'vendor/underscore',
     'vendor/moment',
-    './../class',
-    './../events',
+    './../../class',
+    './../../events',
     './../assettable'
 ], function($, _, moment, Class, Eventable, asSettable) {
     var MyClass = Class.extend({}),

@@ -17,13 +17,15 @@ define([
         ok(_.isFunction(_.props));
     });
 
-    test('mixin methods work', function() {
+    test('`props` methods work', function() {
         var models = [
             Model('a'),
             Model('a'),
             Model('b'),
             Model('c')
         ];
+
+        equal(_.props().length, 0);
         equal(_.props(models, 'a').length, 2);
         equal(_.props(models, 'b').length, 1);
         equal(_.props(models, 'c').length, 1);

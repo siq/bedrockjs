@@ -4,20 +4,37 @@ define([
 ], function(_) {
 
     var Model = function(value) {
-        var prop = value;
-        return {
-            get: function(value) {
-                return (value === prop)?
-                    prop : undefined;
-            }
+            return {
+                get: function(value) {
+                    return (this[value] === this.prop)?
+                        this.prop : undefined;
+                },
+                prop: value
+            };
         };
-    };
 
     test('mixin methods present', function() {
         ok(_.isFunction(_.props));
     });
 
-    test('`props` methods work', function() {
+    test('`props` method work', function() {
+        var models = [
+                Model('a'),
+                Model('a'),
+                Model('b'),
+                Model('c')
+            ],
+            props = _.props(models, 'prop');
+
+        equal(_.props().length, 0);
+        equal(props.length, 4);
+        equal(props[0], 'a');
+        equal(props[1], 'a');
+        equal(props[2], 'b');
+        equal(props[3], 'c');
+    });
+
+    test('`where` method work', function() {
         var models = [
             Model('a'),
             Model('a'),
@@ -25,14 +42,46 @@ define([
             Model('c')
         ];
 
-        equal(_.props().length, 0);
-        equal(_.props(models, 'a').length, 2);
-        equal(_.props(models, 'b').length, 1);
-        equal(_.props(models, 'c').length, 1);
-        equal(_.props(models, 'a')[0], 'a');
-        equal(_.props(models, 'a')[1], 'a');
-        equal(_.props(models, 'b')[0], 'b');
-        equal(_.props(models, 'c')[0], 'c');
+        equal(_.where().length, 0);
+        equal(_.where(models, 'prop', undefined).length, 0);
+        equal(_.where(models, 'prop', {}).length, 0);
+        equal(_.where(models, 'prop', 'a').length, 2);
+        equal(_.where(models, 'prop', 'b').length, 1);
+        equal(_.where(models, 'prop', 'c').length, 1);
+        equal(_.where(models, 'prop', 'a')[0], models[0]);
+        equal(_.where(models, 'prop', 'a')[1], models[1]);
+        equal(_.where(models, 'prop', 'b')[0], models[2]);
+        equal(_.where(models, 'prop', 'c')[0], models[3]);
+
+        // standard findWhere functionality
+        equal(_.where(models, {prop: 'a'}).length, 2);
+        equal(_.where(models, {prop: 'b'}).length, 1);
+        equal(_.where(models, {prop: 'c'}).length, 1);
+        equal(_.where(models, {prop: 'a'})[0], models[0]);
+        equal(_.where(models, {prop: 'a'})[1], models[1]);
+        equal(_.where(models, {prop: 'b'})[0], models[2]);
+        equal(_.where(models, {prop: 'c'})[0], models[3]);
+    });
+
+    test('`findWhere` method work', function() {
+        var models = [
+            Model('a'),
+            Model('a'),
+            Model('b'),
+            Model('c')
+        ];
+
+        equal(_.findWhere(), null);
+        equal(_.findWhere(models, 'prop', undefined), null);
+        equal(_.findWhere(models, 'prop', 'a'), models[0]);
+        equal(_.findWhere(models, 'prop', 'b'), models[2]);
+        equal(_.findWhere(models, 'prop', 'c'), models[3]);
+
+        // standard findWhere functionality
+        equal(_.findWhere(models, {prop: 'a'}), models[0]);
+        equal(_.findWhere(models, {prop: 'b'}), models[2]);
+        equal(_.findWhere(models, {prop: 'c'}), models[3]);
+
     });
 
     start();

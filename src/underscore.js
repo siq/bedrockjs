@@ -15,7 +15,11 @@ define([
 
     var whereProps = function(list, prop, value, first) {
         return _[first ? 'find' : 'filter'](list, function(model) {
-            if (model.get(prop) !== value) return false;
+            if (model.get) {
+                if (model.get(prop) !== value) return false;
+            } else {
+                if (model.prop !== value) return false;
+            }
             return true;
         });
     };

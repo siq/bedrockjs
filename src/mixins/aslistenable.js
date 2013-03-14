@@ -33,7 +33,7 @@ define([
                         if (self.previous(prop)) {
                             self.previous(prop).off(evt, self[method]);
                         }
-                        if (self.has(prop)) {
+                        if (self.get(prop)) {
                             self.get(prop).on(evt, self[method]);
                         }
                     }

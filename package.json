@@ -12,8 +12,8 @@
   ],
   "version": "1.0.17",
   "dependencies": {
-    "csi": "git+ssh://git@github.com:siq/csi.git",
-    "siq-vendor-js": "git+ssh://git@github.com:siq/siq-vendor-js.git"
+    "csi": "git+ssh://git@github.com:siq/csi.git#release-7.3.0.0",
+    "siq-vendor-js": "git+ssh://git@github.com:siq/siq-vendor-js.git#release-7.3.0.0"
   },
   "csi": {
     "name": "bedrock"

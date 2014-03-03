@@ -13,8 +13,8 @@ define([
     
     
     function areNotEquivArrays(newValue,oldValue) {
-        return true;
-        var ltr = true,
+        var areArraysEqual = false,
+            ltr = true,
             rtl = true;
         
         //if {newValue,oldValue} are falsy or not an array this comparison is useless
@@ -26,22 +26,17 @@ define([
             return true;
         }
         
-        // empty arrays are very much equal and the previous test ensures we are indeed comparing
+        // empty arrays are equal and the previous test ensures we are indeed comparing
         // arrays
         if(_.isEmpty(newValue) && _.isEmpty(oldValue)) {
             return false;
         }
 
-        _.each(newValue,function(newVal) {
-            _.each(oldValue,function(oldVal){
-                ltr = ltr && _.isEqual(newVal, oldVal);
-                // at the first not equal break both loops, there is atleast one element
-                // in newValue that does not equal another in oldValue
-                if(!ltr) { 
-                    return false;
-                }
-            });
-            if(!ltr) {
+        _.each(newValue,function(newVal, idx) {
+            ltr = _.isEqual(newVal, oldValue[idx]);
+            // at the first not equal break both loops, there is atleast one element
+            // in newValue that does not equal another in oldValue
+            if(!ltr) { 
                 return false;
             }
         });
@@ -51,21 +46,18 @@ define([
             return true;
         }
         
-        _.each(oldValue,function(oldVal){
-            _.each(newValue,function(newVal){
-                rtl = _.isEqual(oldVal, newVal);
-                // at the first not equal break both loops, there is atleast one element
-                // in oldValue that does not equal another in newValue
-                if(!rtl) {
-                    return false;
-                }
-            });
+        _.each(oldValue,function(oldVal, idx){
+            rtl = _.isEqual(oldVal, newValue[idx]);
+            // at the first not equal break both loops, there is atleast one element
+            // in oldValue that does not equal another in newValue
             if(!rtl) {
                 return false;
             }
         });
         
-        return (ltr || rtl);
+        areArraysEqual = ltr && rtl;
+        
+        return !areArraysEqual;
     }
 
     // if you're trying to operate on some nested prop like `foo.bar.baz`, and
@@ -451,6 +443,6 @@ define([
 
     asSettable.nested = nested;
     asSettable.flattened = flattened;
-
+    asSettable.areNotEquivArrays = areNotEquivArrays;
     return asSettable;
 });

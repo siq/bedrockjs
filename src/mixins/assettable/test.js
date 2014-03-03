@@ -691,6 +691,145 @@ define([
         ok(changeFired);
         ok(!errorFired);
     });
+    
+    test('setting the same string on a property should not trigger a change',function(){
+        var changeFired = false,
+            BaseClass = Class.extend({
+                onChange: function(changes, opts) {
+                    changeFired = true;
+                }
+            }),
+            instance;
+            
+        asSettable.call(BaseClass.prototype, {
+            onChange: 'onChange'
+        });
+        
+        instance = BaseClass();
+        instance.set('stringProp',"winterfell");
+        ok(changeFired,'setting value initially triggers change');
+        changeFired = false;
+        instance.set('stringProp','stark');
+        equal(changeFired, true,'setting a different value triggers change');
+        changeFired = false;
+        instance.set('stringProp','stark');
+        equal(changeFired, false,'setting same value again should not trigger a change');
+    });
+    
+    test('setting the same array on a property should not trigger a change',function(){
+        var changeFired = false,
+            BaseClass = Class.extend({
+                onChange: function(changes, opts) {
+                    changeFired = true;
+                }
+            }),
+            instance;
+            
+        asSettable.call(BaseClass.prototype, {
+            onChange: 'onChange'
+        });
+        
+        instance = BaseClass();
+        instance.set('arrayProp',[1,2,3,4]);
+        ok(changeFired,'setting value initially triggers change');
+        changeFired = false;
+        instance.set('arrayProp',[1,2,3]);
+        equal(changeFired, true,'setting a different value triggers change');
+        changeFired = false;
+        instance.set('arrayProp',[1,2,3]);
+        equal(changeFired, false,'setting same value again should not trigger a change');
+    });
+    
+    test('setting the same object on a property should not trigger a change',function(){
+        var changeFired = false,
+            BaseClass = Class.extend({
+                onChange: function(changes, opts) {
+                    changeFired = true;
+                }
+            }),
+            instance;
+            
+        asSettable.call(BaseClass.prototype, {
+            onChange: 'onChange'
+        });
+        
+        //TODO using notNested might not be a solution, need more info on what is expected
+        instance = BaseClass();
+        instance.set('objProp',{"a":1,"b":2,"c":3},{notNested:true});
+        ok(changeFired,'setting value initially triggers change');
+        changeFired = false;
+        instance.set('objProp',{"a":1,"b":2},{notNested:true});
+        equal(changeFired, true,'setting a different value triggers change');
+        changeFired = false;
+        instance.set('objProp',{"a":1,"b":2},{notNested:true});
+        equal(changeFired, false,'setting same value again should not trigger a change');
+        
+        console.log(instance.get('objProp'))
+    });
+    
+    module('Utility function areNotEquivArrays') 
+    
+    var areNotEquivArrays = function (newValue,oldValue) {
+        var ltr = true,
+            rtl = true;
+        
+        //if {newValue,oldValue} are falsy or not an array this comparison is useless
+        if(!newValue || 
+           !$.isArray(newValue) ||
+           !oldValue ||
+           !$.isArray(oldValue) ||
+           newValue.length !== oldValue.length) {
+            return true;
+        }
+        
+        // empty arrays are very much equal and the previous test ensures we are indeed comparing
+        // arrays
+        if(_.isEmpty(newValue) && _.isEmpty(oldValue)) {
+            return false;
+        }
+
+        _.each(newValue,function(newVal) {
+            _.each(oldValue,function(oldVal){
+                ltr = ltr && _.isEqual(newVal, oldVal);
+                // at the first not equal break both loops, there is atleast one element
+                // in newValue that does not equal another in oldValue
+                if(!ltr) { 
+                    return false;
+                }
+            });
+            if(!ltr) {
+                return false;
+            }
+        });
+        
+        // there is atleast one inequal value, implies arrays are not equal
+        if(!ltr) {
+            return true;
+        }
+        
+        _.each(oldValue,function(oldVal){
+            _.each(newValue,function(newVal){
+                rtl = _.isEqual(oldVal, newVal);
+                // at the first not equal break both loops, there is atleast one element
+                // in oldValue that does not equal another in newValue
+                if(!rtl) {
+                    return false;
+                }
+            });
+            if(!rtl) {
+                return false;
+            }
+        });
+        
+        return (ltr || rtl);
+    }
+    
+    test("basic tests", function(){
+        //equal(areNotEquivArrays([],[]), false, 'empty arrays are equal');
+        ok(areNotEquivArrays([1,2],[]), 'Compare empty array with non-empty ones'); 
+    }); 
+    
+
 
     start();
 });

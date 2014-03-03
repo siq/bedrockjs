@@ -11,11 +11,9 @@ define([
         return true;
     }
     
-    
+    // won't work while comparing array of arrays (multidimensional), can be implemented with some recursion
     function areNotEquivArrays(newValue,oldValue) {
-        var areArraysEqual = false,
-            ltr = true,
-            rtl = true;
+        var areArraysEqual = false;
         
         //if {newValue,oldValue} are falsy or not an array this comparison is useless
         if(!newValue || 
@@ -32,30 +30,15 @@ define([
             return false;
         }
 
-        _.each(newValue,function(newVal, idx) {
-            ltr = _.isEqual(newVal, oldValue[idx]);
-            // at the first not equal break both loops, there is atleast one element
+        $.each(newValue,function(idx, newVal) {
+            areArraysEqual = _.isEqual(newVal, oldValue[idx]);
+            // at the first `not equal` break loop, there is atleast one element
             // in newValue that does not equal another in oldValue
-            if(!ltr) { 
+            if(!areArraysEqual) { 
                 return false;
             }
         });
         
-        // there is atleast one inequal value, implies arrays are not equal
-        if(!ltr) {
-            return true;
-        }
-        
-        _.each(oldValue,function(oldVal, idx){
-            rtl = _.isEqual(oldVal, newValue[idx]);
-            // at the first not equal break both loops, there is atleast one element
-            // in oldValue that does not equal another in newValue
-            if(!rtl) {
-                return false;
-            }
-        });
-        
-        areArraysEqual = ltr && rtl;
         
         return !areArraysEqual;
     }

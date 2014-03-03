@@ -763,8 +763,7 @@ define([
         changeFired = false;
         instance.set('objProp',{"a":1,"b":2},{notNested:true});
         equal(changeFired, false,'setting same value again should not trigger a change');
-        
-        console.log(instance.get('objProp'))
+
     });
     
     module('Utility function areNotEquivArrays') 
@@ -773,10 +772,29 @@ define([
     
     test("basic tests", function(){
         equal(areNotEquivArrays([],[]), false, 'empty arrays are equal');
-        ok(areNotEquivArrays([1,2],[]), 'Compare empty array with non-empty ones'); 
+        ok(areNotEquivArrays([1,2],[]), 'compare empty array with a non-empty one'); 
+        
+        ok(areNotEquivArrays([1,2],[1,2,19]), 'arrays with different lengths are not equal'); 
+        ok(areNotEquivArrays([1,2,3,4],[1,3,2,4]), 'order is important');
+        
+        equal(areNotEquivArrays([2,8,10,-1,32], [2,8,10,-1,32]), false, 'compare regular arrays- equal'); 
+        equal(areNotEquivArrays([2,8,30,-1,32], [2,8,18,-1,32]), true, 'compare regular arrays - not equal'); 
+        
         equal(areNotEquivArrays([{a:1,b:2},{a:1,b:2,c:3}],
-        [{a:1,b:2},{a:1,b:2,c:3}]),false, 'Compare empty array with non-empty ones'); 
+            [{a:1,b:2},{a:1,b:2,c:3}]), false, 'compare array of objects - equal'); 
+        equal(areNotEquivArrays([{a:1,b:2},{a:1,b:2,c:3}],
+            [{a:1,b:2},{b:2,c:3}]), true, 'compare array of objects - not equal'); 
+            
+        equal(areNotEquivArrays([new Date(2013,10,10), new Date(2013,11,10)],[new Date(2013,10,10), new Date(2013,11,10)]),
+            false, 'compare array of dates - equal');
+        equal(areNotEquivArrays([new Date(2013,10,10), new Date(2013,11,10)],[new Date(2013,12,12), new Date(2013,11,10)]),
+            true, 'compare array of dates - not equal');
+        
+            
+        
     }); 
+    
+    
     
 
 

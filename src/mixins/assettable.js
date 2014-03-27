@@ -2,46 +2,7 @@ define([
     'vendor/jquery',
     'vendor/underscore'
 ], function($, _) {
-    var isObject = _.isObject, $isPlainObject = $.isPlainObject;
-
-    function areNotEquivDates(v1, v2) {
-        if (v1 && v1.getDate && v2 && v2.getDate) {
-            return v1.toString() !== v2.toString();
-        }
-        return true;
-    }
-    
-    // won't work while comparing array of arrays (multidimensional), can be implemented with some recursion
-    function areNotEquivArrays(newValue,oldValue) {
-        var areArraysEqual = false;
-        
-        //if {newValue,oldValue} are falsy or not an array this comparison is useless
-        if(!newValue || 
-           !$.isArray(newValue) ||
-           !oldValue ||
-           !$.isArray(oldValue) ||
-           newValue.length !== oldValue.length) {
-            return true;
-        }
-        
-        // empty arrays are equal and the previous test ensures we are indeed comparing
-        // arrays
-        if(_.isEmpty(newValue) && _.isEmpty(oldValue)) {
-            return false;
-        }
-
-        $.each(newValue,function(idx, newVal) {
-            areArraysEqual = _.isEqual(newVal, oldValue[idx]);
-            // at the first `not equal` break loop, there is atleast one element
-            // in newValue that does not equal another in oldValue
-            if(!areArraysEqual) { 
-                return false;
-            }
-        });
-        
-        
-        return !areArraysEqual;
-    }
+    var isObject = _.isObject, $isPlainObject = $.isPlainObject, isEqual = _.isEqual;
 
     // if you're trying to operate on some nested prop like `foo.bar.baz`, and
     // you've got an object `{foo: {bar: {baz: 123}}}`, then this will return
@@ -207,7 +168,8 @@ define([
             eventName = _settable.eventName,
             onChange = _settable.onChange,
             onError = _settable.onError,
-            areEqual = _settable.areEqual,
+            // default areEqual to _.isEqual if not overridden
+            areEqual = _settable.areEqual || isEqual,
             isString = _.isString,
             isPlainObject = _settable.isPlainObject,
             handleChanges = function(changes, opts) {
@@ -372,11 +334,7 @@ define([
                     value = this.get(prop);
                     newValue = newProps[prop];
 
-                    valuesArentEqual = areEqual?
-                        !areEqual(value, newValue) :
-                        newValue !== value && areNotEquivDates(value, newValue) && 
-                                     areNotEquivArrays(value, newValue) &&
-                                     !_.isEqual(value, newValue);
+                    valuesArentEqual = !areEqual(value, newValue);
 
                     if (valuesArentEqual ||
 
@@ -426,6 +384,5 @@ define([
 
     asSettable.nested = nested;
     asSettable.flattened = flattened;
-    asSettable.areNotEquivArrays = areNotEquivArrays;
     return asSettable;
 });

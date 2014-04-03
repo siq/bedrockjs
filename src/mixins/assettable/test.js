@@ -691,6 +691,80 @@ define([
         ok(changeFired);
         ok(!errorFired);
     });
+    
+    test('setting the same string on a property should not trigger a change',function(){
+        var changeFired = false,
+            BaseClass = Class.extend({
+                onChange: function(changes, opts) {
+                    changeFired = true;
+                }
+            }),
+            instance;
+            
+        asSettable.call(BaseClass.prototype, {
+            onChange: 'onChange'
+        });
+        
+        instance = BaseClass();
+        instance.set('stringProp',"winterfell");
+        ok(changeFired,'setting value initially triggers change');
+        changeFired = false;
+        instance.set('stringProp','stark');
+        equal(changeFired, true,'setting a different value triggers change');
+        changeFired = false;
+        instance.set('stringProp','stark');
+        equal(changeFired, false,'setting same value again should not trigger a change');
+    });
+    
+    test('setting the same array on a property should not trigger a change',function(){
+        var changeFired = false,
+            BaseClass = Class.extend({
+                onChange: function(changes, opts) {
+                    changeFired = true;
+                }
+            }),
+            instance;
+            
+        asSettable.call(BaseClass.prototype, {
+            onChange: 'onChange'
+        });
+        
+        instance = BaseClass();
+        instance.set('arrayProp',[1,2,3,4]);
+        ok(changeFired,'setting value initially triggers change');
+        changeFired = false;
+        instance.set('arrayProp',[1,2,3]);
+        equal(changeFired, true,'setting a different value triggers change');
+        changeFired = false;
+        instance.set('arrayProp',[1,2,3]);
+        equal(changeFired, false,'setting same value again should not trigger a change');
+    });
+    
+    test('setting the same object on a property should not trigger a change',function(){
+        var changeFired = false,
+            BaseClass = Class.extend({
+                onChange: function(changes, opts) {
+                    changeFired = true;
+                }
+            }),
+            instance;
+            
+        asSettable.call(BaseClass.prototype, {
+            onChange: 'onChange'
+        });
+        
+        //TODO using notNested might not be a solution, need more info on what is expected
+        instance = BaseClass();
+        instance.set('objProp',{"a":1,"b":2,"c":3},{notNested:true});
+        ok(changeFired,'setting value initially triggers change');
+        changeFired = false;
+        instance.set('objProp',{"a":1,"b":2},{notNested:true});
+        equal(changeFired, true,'setting a different value triggers change');
+        changeFired = false;
+        instance.set('objProp',{"a":1,"b":2},{notNested:true});
+        equal(changeFired, false,'setting same value again should not trigger a change');
+
+    });
 
     start();
 });

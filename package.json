@@ -12,8 +12,8 @@
   ],
   "version": "1.0.28",
   "dependencies": {
-    "siq-vendor-js": "git+ssh://siq-git.dub.usoh.ibm.com:2222/siq-vendor-js",
-    "csi": "git+ssh://siq-git.dub.usoh.ibm.com:2222/csi"
+    "siq-vendor-js": "git+ssh://git.siqbuild.lab/var/git/siq-vendor-js.git",
+    "csi": "git+ssh://git.siqbuild.lab/var/git/csi.git"
   },
   "csi": {
     "name": "bedrock"

@@ -10,7 +10,7 @@
       "name": "Jordan McCoy"
     }
   ],
-  "version": "1.0.28",
+  "version": "1.0.29",
   "dependencies": {
     "siq-vendor-js": "git+ssh://git.siqbuild.lab/var/git/siq-vendor-js.git",
     "csi": "git+ssh://git.siqbuild.lab/var/git/csi.git"

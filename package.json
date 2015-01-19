@@ -12,13 +12,16 @@
   ],
   "version": "1.0.29",
   "dependencies": {
-    "siq-vendor-js": "git+ssh://git.siqbuild.lab/var/git/siq-vendor-js.git",
-    "csi": "git+ssh://git.siqbuild.lab/var/git/csi.git"
+    "siq-vendor-js": "git+ssh://git.siqbuild.lab/var/git/siq-vendor-js.git"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-cli": "^0.1.13",
+    "grunting": "git+ssh://git.siqbuild.lab/var/git/grunting.git"
   },
   "csi": {
     "name": "bedrock"
   },
-  "devDependencies": {},
   "optionalDependencies": {},
   "engines": {
     "node": "*"

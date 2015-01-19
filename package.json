@@ -16,7 +16,7 @@
     "url": "git+ssh://git.siqbuild.lab/var/git/bedrockjs.git"
   },
   "dependencies": {
-    "siq-vendor-js": "git+ssh://git.siqbuild.lab/var/git/siq-vendor-js.git"
+    "siq-vendor-js": "git+ssh://git.siqbuild.lab/var/git/siq-vendor-js.git#grunting"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

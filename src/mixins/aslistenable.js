@@ -11,14 +11,14 @@ define([
 
         this._bindListener = function(listener) {
             var prop = listener[0], evt = listener[1], method = listener[2];
-            if (this.has(prop)) {
+            if (this.has(prop) && !!this.get(prop)) {
                 this.get(prop).on(evt, this[method]);
             }
         };
 
         this._unbindListener = function(listener) {
             var prop = listener[0], evt = listener[1], method = listener[2];
-            if (this.has(prop)) {
+            if (this.has(prop) && !!this.get(prop)) {
                 this.get(prop).off(evt, this[method]);
             }
         };

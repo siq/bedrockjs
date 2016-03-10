@@ -10,7 +10,7 @@
       "name": "Jordan McCoy"
     }
   ],
-  "version": "1.0.34",
+  "version": "1.0.35",
   "repository": {
     "type": "git",
     "url": "git+ssh://git.siqbuild.lab/var/git/bedrockjs.git"

@@ -10,7 +10,7 @@
       "name": "Jordan McCoy"
     }
   ],
-  "version": "1.0.36",
+  "version": "1.0.37",
   "repository": {
     "type": "git",
     "url": "git+ssh://github.ibm.com/storediq/bedrockjs.git"

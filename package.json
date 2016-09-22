@@ -13,15 +13,15 @@
   "version": "1.0.36",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git.siqbuild.lab/var/git/bedrockjs.git"
+    "url": "git+ssh://github.ibm.com/storediq/bedrockjs.git"
   },
   "dependencies": {
-    "siq-vendor-js": "git+ssh://git.siqbuild.lab/var/git/siq-vendor-js.git"
+    "siq-vendor-js": "git+ssh://github.ibm.com/storediq/siq-vendor-js.git"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-cli": "^0.1.13",
-    "grunting": "git+ssh://git.siqbuild.lab/var/git/grunting.git"
+    "grunting": "git+ssh://github.ibm.com/storediq/grunting.git"
   },
   "csi": {
     "name": "bedrock"

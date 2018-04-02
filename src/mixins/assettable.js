@@ -291,6 +291,13 @@ define([
         //
         this.set = function(/* arguments */) {
             var newProps = {}, opts = {};
+            
+            for(var i = 0, l = arguments.length; i < l; i++) {
+            		if (arguments[i] == 'infoset.id') {
+            			console.info('CHANGED infoset.id: ' + arguments);
+            			console.trace();
+            		}
+            }
 
             if (arguments.length === 1) {
                 newProps = arguments[0];

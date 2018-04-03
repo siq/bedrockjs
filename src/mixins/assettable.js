@@ -293,7 +293,7 @@ define([
             var newProps = {}, opts = {};
             
             for(var i = 0, l = arguments.length; i < l; i++) {
-            		if (arguments[i] == 'route' || arguments[i] == 'infoset.id' || arguments[i] == 'infoset') {
+            		if (arguments[i] == 'route' || arguments[i] == 'infoset') {
             			console.info('assettable CHANGED: ' + Object.values(arguments));
             			console.trace();
             		}

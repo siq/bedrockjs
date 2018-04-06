@@ -5,3 +5,5 @@ testResult.json
 testResult.xml
 /.project
 /.settings/
+.DS_Store
+package-lock.json

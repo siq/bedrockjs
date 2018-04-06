@@ -291,13 +291,6 @@ define([
         //
         this.set = function(/* arguments */) {
             var newProps = {}, opts = {};
-            
-            for(var i = 0, l = arguments.length; i < l; i++) {
-            		if (arguments[i] == 'route' || arguments[i] == 'infoset') {
-            			console.info('assettable CHANGED: ' + Object.values(arguments));
-            			console.trace();
-            		}
-            }
 
             if (arguments.length === 1) {
                 newProps = arguments[0];
